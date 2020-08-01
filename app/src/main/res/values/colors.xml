@@ -4,4 +4,7 @@
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#ffffff</color>
     <color name="btnBlack">#000000</color>
+    <color name="errorColor">#FF0C00</color>
+    <color name="blackProgressBar">#000000</color>
+    <color name="successBlue">#36CDA9</color>
 </resources>

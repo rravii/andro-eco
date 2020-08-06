@@ -143,7 +143,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView
-        android:id="@+id/imageView5"
+        android:id="@+id/happy_shopping_image"
         android:layout_width="283dp"
         android:layout_height="148dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -152,11 +152,11 @@
         app:srcCompat="@mipmap/happy_shopping" />
 
     <ImageView
-        android:id="@+id/imageView16"
+        android:id="@+id/happy_shopping_smily"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageView5"
+        app:layout_constraintStart_toEndOf="@+id/happy_shopping_image"
         app:srcCompat="@mipmap/happy" />
 </androidx.constraintlayout.widget.ConstraintLayout>

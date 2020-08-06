@@ -7,4 +7,5 @@
     <color name="errorColor">#FF0C00</color>
     <color name="blackProgressBar">#000000</color>
     <color name="successBlue">#36CDA9</color>
+    <color name="RecyclerViewBackground">#d6d6d6</color>
 </resources>

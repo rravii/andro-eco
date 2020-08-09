@@ -3,8 +3,11 @@ package com.example.myecommerce;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -12,9 +15,11 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
@@ -28,6 +33,15 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
     private ViewPager productImagesViewPager;
     private TabLayout viewPagerIndicator;
+    private Button coupenRedeemBtn;
+
+    //////coupen Dialog
+    public static TextView coupenTitle;
+    public static TextView coupenExpiryDate;
+    public static TextView coupenBody;
+    private static RecyclerView coupensRecyclerView; // static because we will use this in static method function
+    private static LinearLayout selectedCoupen;
+    //////coupen Dialog
 
     private ViewPager productDetailsViewpager;
     private TabLayout productDetailsTablayout;
@@ -59,6 +73,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
         productDetailsViewpager = findViewById(R.id.product_details_viewpager);
         productDetailsTablayout = findViewById(R.id.product_details_tablayout);
         buyNowBtn = findViewById(R.id.buy_now_btn);
+        coupenRedeemBtn = findViewById(R.id.coupen_redemption_btn);
 
         List<Integer> productImages = new ArrayList<>();
         productImages.add(R.mipmap.mobile);
@@ -121,11 +136,74 @@ public class ProductDetailsActivity extends AppCompatActivity {
         buyNowBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent deliveryIntent = new Intent(ProductDetailsActivity.this,DeliveryActivity.class);
-                startActivity(deliveryIntent);
+            Intent deliveryIntent = new Intent(ProductDetailsActivity.this,DeliveryActivity.class);
+            startActivity(deliveryIntent);
             }
         });
 
+        //////// coupen dialog
+
+        final Dialog checkCoupenPriceDialog = new Dialog(ProductDetailsActivity.this);
+        checkCoupenPriceDialog.setContentView(R.layout.coupen_redeem_dialog);
+        checkCoupenPriceDialog.setCancelable(true);
+
+        checkCoupenPriceDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        ImageView toggleRecyclerView = checkCoupenPriceDialog.findViewById(R.id.toggle_recyclerview);
+        coupensRecyclerView = checkCoupenPriceDialog.findViewById(R.id.coupens_recyclerview);
+        selectedCoupen = checkCoupenPriceDialog.findViewById(R.id.selected_coupen);
+
+        coupenTitle = checkCoupenPriceDialog.findViewById(R.id.coupen_title);
+        coupenExpiryDate = checkCoupenPriceDialog.findViewById(R.id.coupen_validity);
+        coupenBody = checkCoupenPriceDialog.findViewById(R.id.coupen_body);
+
+        TextView originalPrice = checkCoupenPriceDialog.findViewById(R.id.original_price);
+        TextView discountedPrice = checkCoupenPriceDialog.findViewById(R.id.discounted_price);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(ProductDetailsActivity.this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        coupensRecyclerView.setLayoutManager(layoutManager);
+
+        List<RewardModel> rewardModelList = new ArrayList<>();
+        rewardModelList.add(new RewardModel("Cashback", "till 2nd,June 2016", "GET 20% CASHBACK on any product above Rs.200/- and below Rs.3000/-."));
+        rewardModelList.add(new RewardModel("Discount", "till 2nd,June 2016", "GET 20% CASHBACK on any product above Rs.200/- and below Rs.3000/-."));
+        rewardModelList.add(new RewardModel("Buy 1 get 1 free", "till 2nd,June 2016", "GET 20% CASHBACK on any product above Rs.200/- and below Rs.3000/-."));
+        rewardModelList.add(new RewardModel("Cashback", "till 2nd,June 2016", "GET 20% CASHBACK on any product above Rs.200/- and below Rs.3000/-."));
+        rewardModelList.add(new RewardModel("Discount", "till 2nd,June 2016", "GET 20% CASHBACK on any product above Rs.200/- and below Rs.3000/-."));
+        rewardModelList.add(new RewardModel("Buy 1 get 1 free", "till 2nd,June 2016", "GET 20% CASHBACK on any product above Rs.200/- and below Rs.3000/-."));
+        rewardModelList.add(new RewardModel("Cashback", "till 2nd,June 2016", "GET 20% CASHBACK on any product above Rs.200/- and below Rs.3000/-."));
+        rewardModelList.add(new RewardModel("Discount", "till 2nd,June 2016", "GET 20% CASHBACK on any product above Rs.200/- and below Rs.3000/-."));
+        rewardModelList.add(new RewardModel("Buy 1 get 1 free", "till 2nd,June 2016", "GET 20% CASHBACK on any product above Rs.200/- and below Rs.3000/-."));
+
+        MyRewardsAdapter myRewardsAdapter = new MyRewardsAdapter(rewardModelList,true);
+        coupensRecyclerView.setAdapter(myRewardsAdapter);
+        myRewardsAdapter.notifyDataSetChanged();
+
+        toggleRecyclerView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showDialogRecyclerView();
+            }
+        });
+        //////// coupen dialog
+
+        coupenRedeemBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                checkCoupenPriceDialog.show();
+            }
+        });
+
+    }
+
+    public static void showDialogRecyclerView(){
+        if(coupensRecyclerView.getVisibility() == View.GONE){
+            coupensRecyclerView.setVisibility(View.VISIBLE);
+            selectedCoupen.setVisibility(View.GONE);
+        }else{
+            coupensRecyclerView.setVisibility(View.GONE);
+            selectedCoupen.setVisibility(View.VISIBLE);
+        }
     }
 
     private void setRating(int starPosition) {

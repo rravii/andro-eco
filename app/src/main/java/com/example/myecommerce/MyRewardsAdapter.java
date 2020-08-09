@@ -13,15 +13,22 @@ import java.util.List;
 public class MyRewardsAdapter extends RecyclerView.Adapter<MyRewardsAdapter.ViewHolder> {
 
     private List<RewardModel> rewardModelList;
+    private Boolean useMiniLayout = false;
 
-    public MyRewardsAdapter(List<RewardModel> rewardModelList) {
+    public MyRewardsAdapter(List<RewardModel> rewardModelList,Boolean useMiniLayout) {
         this.rewardModelList = rewardModelList;
+        this.useMiniLayout = useMiniLayout;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.rewards_item_layout,viewGroup,false);
+        View view;
+        if(useMiniLayout){
+            view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.mini_rewards_item_layout,viewGroup,false);
+        }else{
+            view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.rewards_item_layout,viewGroup,false);
+        }
         return new ViewHolder(view);
     }
 
@@ -53,10 +60,22 @@ public class MyRewardsAdapter extends RecyclerView.Adapter<MyRewardsAdapter.View
             coupenBody = itemView.findViewById(R.id.coupen_body);
         }
 
-        private void setData(String title, String date, String body){
+        private void setData(final String title, final String date, final String body){
             coupenTitle.setText(title);
             coupenExpiryDate.setText(date);
             coupenBody.setText(body);
+
+            if(useMiniLayout){
+                itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ProductDetailsActivity.coupenTitle.setText(title);
+                        ProductDetailsActivity.coupenExpiryDate.setText(date);
+                        ProductDetailsActivity.coupenBody.setText(body);
+                        ProductDetailsActivity.showDialogRecyclerView();
+                    }
+                });
+            }
         }
     }
 }

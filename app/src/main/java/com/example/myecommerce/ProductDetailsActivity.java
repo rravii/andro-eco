@@ -22,6 +22,8 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.myecommerce.MainActivity.showCart;
+
 public class ProductDetailsActivity extends AppCompatActivity {
 
     private ViewPager productImagesViewPager;
@@ -158,7 +160,9 @@ public class ProductDetailsActivity extends AppCompatActivity {
             ///todo: search
             return true;
         }else if (id == R.id.main_cart_icon){
-            ///todo: cart
+            Intent cartIntent = new Intent(ProductDetailsActivity.this,MainActivity.class);
+            showCart = true;
+            startActivity(cartIntent);
             return true;
         }
 

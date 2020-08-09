@@ -81,7 +81,7 @@ public class MyWishlistFragment extends Fragment {
         wishlistModelList.add(new WishlistModel(R.mipmap.mobile, "Oppo awf", 4, "3", 123, "Rs.4999/-", "Rs.5999/-", "Cash on delivery"));
         wishlistModelList.add(new WishlistModel(R.mipmap.mobile, "Oppo awf", 0, "3", 123, "Rs.4999/-", "Rs.5999/-", "Cash on delivery"));
 
-        WishlistAdapter wishlistAdapter = new WishlistAdapter(wishlistModelList);
+        WishlistAdapter wishlistAdapter = new WishlistAdapter(wishlistModelList, true);
         wishlistRecyclerView.setAdapter(wishlistAdapter); // setting this list in recyclerView
         wishlistAdapter.notifyDataSetChanged();
 

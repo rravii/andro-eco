@@ -53,7 +53,7 @@ public class MyAddressesActivity extends AppCompatActivity {
         if (mode == SELECT_ADDRESS){
             deliverHereBtn.setVisibility(View.VISIBLE);
         }else {
-            deliverHereBtn.setVisibility(View.INVISIBLE);
+            deliverHereBtn.setVisibility(View.GONE);
         }
         addressesAdapter = new AddressesAdapter(addressesModelList, mode);
         myAddressesRecyclerView.setAdapter(addressesAdapter);

@@ -105,22 +105,14 @@ public class HomeFragment extends Fragment {
 
         //////////////// Banner Slider
         List<SliderModel>sliderModelList = new ArrayList<SliderModel>();
-
-        sliderModelList.add(new SliderModel(R.mipmap.home_icon,"#077AE4"));
-        sliderModelList.add(new SliderModel(R.mipmap.bell,"#077AE4"));
         sliderModelList.add(new SliderModel(R.mipmap.black_email,"#077AE4"));
-
         sliderModelList.add(new SliderModel(R.mipmap.blue_email,"#077AE4"));
         sliderModelList.add(new SliderModel(R.mipmap.ic_launcher,"#077AE4"));
         sliderModelList.add(new SliderModel(R.mipmap.app_icon,"#077AE4"));
         sliderModelList.add(new SliderModel(R.mipmap.black_cart,"#077AE4"));
         sliderModelList.add(new SliderModel(R.mipmap.profile_placeholder,"#077AE4"));
         sliderModelList.add(new SliderModel(R.mipmap.home_icon,"#077AE4"));
-
         sliderModelList.add(new SliderModel(R.mipmap.bell,"#077AE4"));
-        sliderModelList.add(new SliderModel(R.mipmap.black_email,"#077AE4"));
-        sliderModelList.add(new SliderModel(R.mipmap.blue_email,"#077AE4"));
-
         //////////////// Banner Slider
 
 
@@ -156,7 +148,13 @@ public class HomeFragment extends Fragment {
         homePageModelList.add(new HomePageModel(3,"Deals of the Day",horizontalProductScrollModelList));
         homePageModelList.add(new HomePageModel(2,"Deals of the Day",horizontalProductScrollModelList));
         homePageModelList.add(new HomePageModel(1,R.mipmap.black_cart,"#ff0000"));
-        homePageModelList.add(new HomePageModel(0,sliderModelList));
+        homePageModelList.add(new HomePageModel(1,R.mipmap.error,"#000000"));
+        homePageModelList.add(new HomePageModel(2,"Deals of the Day",horizontalProductScrollModelList));
+        homePageModelList.add(new HomePageModel(3,"Deals of the Day",horizontalProductScrollModelList));
+        homePageModelList.add(new HomePageModel(1,R.mipmap.banner,"#ffff00"));
+        homePageModelList.add(new HomePageModel(3,"Deals of the Day",horizontalProductScrollModelList));
+        homePageModelList.add(new HomePageModel(2,"Deals of the Day",horizontalProductScrollModelList));
+        homePageModelList.add(new HomePageModel(1,R.mipmap.black_cart,"#ff0000"));
 
         HomePageAdapter adapter = new HomePageAdapter(homePageModelList);
         testing.setAdapter(adapter);

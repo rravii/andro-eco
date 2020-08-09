@@ -1,5 +1,6 @@
 package com.example.myecommerce;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +17,11 @@ import java.util.List;
 public class WishlistAdapter extends RecyclerView.Adapter<WishlistAdapter.ViewHolder> {
 
     private List<WishlistModel> wishlistModelList;
+    private Boolean wishlist;
 
-    public WishlistAdapter(List<WishlistModel> wishlistModelList) {
+    public WishlistAdapter(List<WishlistModel> wishlistModelList, Boolean wishlist) {
         this.wishlistModelList = wishlistModelList;
+        this.wishlist = wishlist;
     }
 
     @NonNull
@@ -96,10 +99,23 @@ public class WishlistAdapter extends RecyclerView.Adapter<WishlistAdapter.ViewHo
             cuttedPrice.setText(cuttedPriceValue);
             paymentMethod.setText(payMethod);
 
+            if (wishlist){
+                deleteBtn.setVisibility(View.VISIBLE);
+            }else {
+                deleteBtn.setVisibility(View.GONE);
+            }
             deleteBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Toast.makeText(itemView.getContext(),"delete",Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent productDetailsIntent = new Intent(itemView.getContext(),ProductDetailsActivity.class);
+                    itemView.getContext().startActivity(productDetailsIntent);
                 }
             });
         }

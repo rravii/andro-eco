@@ -61,21 +61,7 @@ public class ViewAllActivity extends AppCompatActivity {
             gridView.setVisibility(View.VISIBLE);
 
             List<HorizontalProductScrollModel> horizontalProductScrollModelList = new ArrayList<>();
-            horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.app_icon, "Redmi 5A", "SD ......", "Rs 1000"));
-            horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.app_round_icon, "Redmi 5A", "SD ......", "Rs 1000"));
-            horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.close_cross, "Redmi 5A", "SD ......", "Rs 1000"));
-            horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.app_icon, "Redmi 5A", "SD ......", "Rs 1000"));
-            horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.app_round_icon, "Redmi 5A", "SD ......", "Rs 1000"));
-            horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.close_cross, "Redmi 5A", "SD ......", "Rs 1000"));
-            horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.app_icon, "Redmi 5A", "SD ......", "Rs 1000"));
-            horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.app_round_icon, "Redmi 5A", "SD ......", "Rs 1000"));
-            horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.close_cross, "Redmi 5A", "SD ......", "Rs 1000"));
-            horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.app_icon, "Redmi 5A", "SD ......", "Rs 1000"));
-            horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.app_round_icon, "Redmi 5A", "SD ......", "Rs 1000"));
-            horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.close_cross, "Redmi 5A", "SD ......", "Rs 1000"));
-            horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.app_icon, "Redmi 5A", "SD ......", "Rs 1000"));
-            horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.app_round_icon, "Redmi 5A", "SD ......", "Rs 1000"));
-            horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.close_cross, "Redmi 5A", "SD ......", "Rs 1000"));
+
 
             GridProductLayoutAdapter gridProductLayoutAdapter = new GridProductLayoutAdapter(horizontalProductScrollModelList);
             gridView.setAdapter(gridProductLayoutAdapter);

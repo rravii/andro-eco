@@ -31,42 +31,6 @@ public class CategoryActivity extends AppCompatActivity {
 
         categoryRecyclerView = findViewById(R.id.category_recyclerview);
 
-        //////////////// Banner Slider
-        List<SliderModel>sliderModelList = new ArrayList<SliderModel>();
-
-        sliderModelList.add(new SliderModel(R.mipmap.home_icon,"#077AE4"));
-        sliderModelList.add(new SliderModel(R.mipmap.bell,"#077AE4"));
-        sliderModelList.add(new SliderModel(R.mipmap.black_email,"#077AE4"));
-
-        sliderModelList.add(new SliderModel(R.mipmap.blue_email,"#077AE4"));
-        sliderModelList.add(new SliderModel(R.mipmap.ic_launcher,"#077AE4"));
-        sliderModelList.add(new SliderModel(R.mipmap.app_icon,"#077AE4"));
-        sliderModelList.add(new SliderModel(R.mipmap.black_cart,"#077AE4"));
-        sliderModelList.add(new SliderModel(R.mipmap.profile_placeholder,"#077AE4"));
-        sliderModelList.add(new SliderModel(R.mipmap.home_icon,"#077AE4"));
-
-        sliderModelList.add(new SliderModel(R.mipmap.bell,"#077AE4"));
-        sliderModelList.add(new SliderModel(R.mipmap.black_email,"#077AE4"));
-        sliderModelList.add(new SliderModel(R.mipmap.blue_email,"#077AE4"));
-
-        //////////////// Banner Slider
-
-
-        ////////////// Horizontal Product Layout
-
-        List<HorizontalProductScrollModel> horizontalProductScrollModelList = new ArrayList<>();
-        horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.app_icon,"Redmi 5A","SD ......","Rs 1000"));
-        horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.app_round_icon,"Redmi 5A","SD ......","Rs 1000"));
-        horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.close_cross,"Redmi 5A","SD ......","Rs 1000"));
-        horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.app_icon,"Redmi 5A","SD ......","Rs 1000"));
-        horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.app_icon,"Redmi 5A","SD ......","Rs 1000"));
-        horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.app_icon,"Redmi 5A","SD ......","Rs 1000"));
-        horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.app_icon,"Redmi 5A","SD ......","Rs 1000"));
-        horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.app_icon,"Redmi 5A","SD ......","Rs 1000"));
-        horizontalProductScrollModelList.add(new HorizontalProductScrollModel(R.mipmap.app_icon,"Redmi 5A","SD ......","Rs 1000"));
-
-        ////////////// Horizontal Product Layout
-
 
         //////////////////////////////////////////////
 
@@ -75,14 +39,6 @@ public class CategoryActivity extends AppCompatActivity {
         categoryRecyclerView.setLayoutManager(testingLayoutManager);
 
         List<HomePageModel> homePageModelList = new ArrayList<>();
-        homePageModelList.add(new HomePageModel(0,sliderModelList));
-        homePageModelList.add(new HomePageModel(1,R.mipmap.error,"#000000"));
-        homePageModelList.add(new HomePageModel(2,"Deals of the Day",horizontalProductScrollModelList));
-        homePageModelList.add(new HomePageModel(3,"Deals of the Day",horizontalProductScrollModelList));
-        homePageModelList.add(new HomePageModel(1,R.mipmap.banner,"#ffff00"));
-        homePageModelList.add(new HomePageModel(3,"Deals of the Day",horizontalProductScrollModelList));
-        homePageModelList.add(new HomePageModel(2,"Deals of the Day",horizontalProductScrollModelList));
-        homePageModelList.add(new HomePageModel(1,R.mipmap.black_cart,"#ff0000"));
 
         HomePageAdapter adapter = new HomePageAdapter(homePageModelList);
         categoryRecyclerView.setAdapter(adapter);

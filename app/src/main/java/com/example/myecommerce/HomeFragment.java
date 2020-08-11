@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,9 +39,10 @@ import java.util.TimerTask;
 
 import static com.example.myecommerce.DBqueries.categoryModelList;
 import static com.example.myecommerce.DBqueries.firebaseFirestore;
-import static com.example.myecommerce.DBqueries.homePageModelList;
+import static com.example.myecommerce.DBqueries.lists;
 import static com.example.myecommerce.DBqueries.loadCategories;
 import static com.example.myecommerce.DBqueries.loadFragmentData;
+import static com.example.myecommerce.DBqueries.loadedCategoriesNames;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -93,7 +95,7 @@ public class HomeFragment extends Fragment {
     private CategoryAdapter categoryAdapter;
     private RecyclerView homePageRecyclerView;
     private HomePageAdapter adapter;
-    private ImageView noInternetConnection;
+    private LinearLayout noInternetConnection;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -127,17 +129,21 @@ public class HomeFragment extends Fragment {
             LinearLayoutManager testingLayoutManager = new LinearLayoutManager(getContext());
             testingLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
             homePageRecyclerView.setLayoutManager(testingLayoutManager);
-            adapter = new HomePageAdapter(homePageModelList);
-            homePageRecyclerView.setAdapter(adapter);
 
-            if (homePageModelList.size() == 0){
-                loadFragmentData(adapter,getContext());
+            if (lists.size() == 0){
+                loadedCategoriesNames.add("HOME");
+                lists.add(new ArrayList<HomePageModel>());
+                adapter = new HomePageAdapter(lists.get(0));// here 0 indicates the 0th position of list
+                loadFragmentData(adapter,getContext(),0, "Home");
             }else {
+                adapter = new HomePageAdapter(lists.get(0));
                 adapter.notifyDataSetChanged();// if homePageModelList is already initialized, only refresh it don't call the query again
             }
 
+            homePageRecyclerView.setAdapter(adapter);
+
         }else {
-            Glide.with(this).load(R.drawable.no_internet_connection).into(noInternetConnection);
+//            Glide.with(this).load(R.drawable.no_internet_connection).into(noInternetConnection);
             noInternetConnection.setVisibility(View.VISIBLE);
         }
 

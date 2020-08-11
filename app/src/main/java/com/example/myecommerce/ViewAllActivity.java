@@ -19,6 +19,9 @@ public class ViewAllActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private GridView gridView;
+    public static List<HorizontalProductScrollModel> horizontalProductScrollModelList;
+    public static List<WishlistModel> wishlistModelList;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +30,7 @@ public class ViewAllActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setTitle("Deals of the Day");
+        getSupportActionBar().setTitle(getIntent().getStringExtra("title"));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         recyclerView = findViewById(R.id.recycler_view);
@@ -41,17 +44,6 @@ public class ViewAllActivity extends AppCompatActivity {
             layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
             recyclerView.setLayoutManager(layoutManager);
 
-            List<WishlistModel> wishlistModelList = new ArrayList<>();
-            wishlistModelList.add(new WishlistModel(R.mipmap.mobile, "Oppo awf", 1, "3", 123, "Rs.4999/-", "Rs.5999/-", "Cash on delivery"));
-            wishlistModelList.add(new WishlistModel(R.mipmap.mobile, "Oppo awf", 0, "3", 123, "Rs.4999/-", "Rs.5999/-", "Cash on delivery"));
-            wishlistModelList.add(new WishlistModel(R.mipmap.mobile, "Oppo awf", 2, "3", 123, "Rs.4999/-", "Rs.5999/-", "Cash on delivery"));
-            wishlistModelList.add(new WishlistModel(R.mipmap.mobile, "Oppo awf", 4, "3", 123, "Rs.4999/-", "Rs.5999/-", "Cash on delivery"));
-            wishlistModelList.add(new WishlistModel(R.mipmap.mobile, "Oppo awf", 0, "3", 123, "Rs.4999/-", "Rs.5999/-", "Cash on delivery"));
-            wishlistModelList.add(new WishlistModel(R.mipmap.mobile, "Oppo awf", 0, "3", 123, "Rs.4999/-", "Rs.5999/-", "Cash on delivery"));
-            wishlistModelList.add(new WishlistModel(R.mipmap.mobile, "Oppo awf", 0, "3", 123, "Rs.4999/-", "Rs.5999/-", "Cash on delivery"));
-            wishlistModelList.add(new WishlistModel(R.mipmap.mobile, "Oppo awf", 0, "3", 123, "Rs.4999/-", "Rs.5999/-", "Cash on delivery"));
-            wishlistModelList.add(new WishlistModel(R.mipmap.mobile, "Oppo awf", 0, "3", 123, "Rs.4999/-", "Rs.5999/-", "Cash on delivery"));
-
             WishlistAdapter adapter = new WishlistAdapter(wishlistModelList, false);
             recyclerView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
@@ -59,10 +51,6 @@ public class ViewAllActivity extends AppCompatActivity {
         }else if (layout_code == 1) {
 
             gridView.setVisibility(View.VISIBLE);
-
-            List<HorizontalProductScrollModel> horizontalProductScrollModelList = new ArrayList<>();
-
-
             GridProductLayoutAdapter gridProductLayoutAdapter = new GridProductLayoutAdapter(horizontalProductScrollModelList);
             gridView.setAdapter(gridProductLayoutAdapter);
         }

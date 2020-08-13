@@ -28,6 +28,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -35,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.myecommerce.MainActivity.showCart;
+import static com.example.myecommerce.RegisterActivity.setSignUpFragment;
 
 public class ProductDetailsActivity extends AppCompatActivity {
 
@@ -47,6 +50,8 @@ public class ProductDetailsActivity extends AppCompatActivity {
     private ImageView codIndicator;
     private TextView tvCodIndicator;
     private TabLayout viewPagerIndicator;
+
+    private LinearLayout coupenRedemptionLayout;
     private Button coupenRedeemBtn;
 
     private TextView rewardTitle;
@@ -74,6 +79,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
     ////// rating layout
 
     private Button buyNowBtn;
+    private LinearLayout addToCartBtn;
 
     private static boolean ALREADY_ADDED_TO_WISHLIST = false;
     private FloatingActionButton addToWishListBtn;
@@ -88,6 +94,8 @@ public class ProductDetailsActivity extends AppCompatActivity {
     private static LinearLayout selectedCoupen;
     //////coupen Dialog
 
+    private Dialog signInDialog;
+    private FirebaseUser currentUser;
 
 
     @Override
@@ -125,12 +133,14 @@ public class ProductDetailsActivity extends AppCompatActivity {
         totalRatingsFigure =  findViewById(R.id.total_ratings_figure);
         ratingsProgressBarContainer = findViewById(R.id.ratings_progressbar_container);
         averageRating = findViewById(R.id.average_rating);
+        addToCartBtn = findViewById(R.id.add_to_cart_btn);
+        coupenRedemptionLayout = findViewById(R.id.coupen_redemption_layout);
 
         firebaseFirestore = FirebaseFirestore.getInstance();
 
         final List<String> productImages = new ArrayList<>();
 
-        firebaseFirestore.collection("PRODUCTS").document("bZQOwTLWIeMKreQrEx7O")
+        firebaseFirestore.collection("PRODUCTS").document(getIntent().getStringExtra("PRODUCT_ID"))
                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -205,12 +215,16 @@ public class ProductDetailsActivity extends AppCompatActivity {
         addToWishListBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (ALREADY_ADDED_TO_WISHLIST){
-                    ALREADY_ADDED_TO_WISHLIST = false;
-                    addToWishListBtn.setSupportImageTintList(ColorStateList.valueOf(Color.parseColor("#A9A9A9")));
-                }else{
-                    ALREADY_ADDED_TO_WISHLIST = true;
-                    addToWishListBtn.setSupportImageTintList(getResources().getColorStateList(R.color.colorPrimaryDark));
+                if (currentUser == null){
+                    signInDialog.show();
+                }else {
+                    if (ALREADY_ADDED_TO_WISHLIST) {
+                        ALREADY_ADDED_TO_WISHLIST = false;
+                        addToWishListBtn.setSupportImageTintList(ColorStateList.valueOf(Color.parseColor("#A9A9A9")));
+                    } else {
+                        ALREADY_ADDED_TO_WISHLIST = true;
+                        addToWishListBtn.setSupportImageTintList(getResources().getColorStateList(R.color.colorPrimaryDark));
+                    }
                 }
             }
         });
@@ -242,7 +256,11 @@ public class ProductDetailsActivity extends AppCompatActivity {
             rateNowContainer.getChildAt(x).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    setRating(starPosition);
+                    if (currentUser == null){
+                        signInDialog.show();
+                    }else {
+                        setRating(starPosition);
+                    }
                 }
             });
         }
@@ -251,8 +269,23 @@ public class ProductDetailsActivity extends AppCompatActivity {
         buyNowBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            Intent deliveryIntent = new Intent(ProductDetailsActivity.this,DeliveryActivity.class);
-            startActivity(deliveryIntent);
+                if (currentUser == null){
+                    signInDialog.show();
+                }else {
+                    Intent deliveryIntent = new Intent(ProductDetailsActivity.this, DeliveryActivity.class);
+                    startActivity(deliveryIntent);
+                }
+            }
+        });
+
+        addToCartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (currentUser == null){
+                    signInDialog.show();
+                }else {
+                    ///////todo: add to cart
+                }
             }
         });
 
@@ -309,6 +342,50 @@ public class ProductDetailsActivity extends AppCompatActivity {
             }
         });
 
+        //////// sign dialog
+        signInDialog = new Dialog(ProductDetailsActivity.this);
+        signInDialog.setContentView(R.layout.sign_in_dialog);
+        signInDialog.setCancelable(true);
+        signInDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        Button dialogSignInBtn = signInDialog.findViewById(R.id.sign_in_btn);
+        Button dialogSignUpBtn = signInDialog.findViewById(R.id.sign_up_btn);
+        final Intent registerIntent = new Intent(ProductDetailsActivity.this,RegisterActivity.class);
+
+        dialogSignInBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SignInFragment.disableCloseBtn = true;
+                SignUpFragment.disableCloseBtn = true;
+                signInDialog.dismiss();
+                setSignUpFragment = false;
+                startActivity(registerIntent);
+            }
+        });
+
+        dialogSignUpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SignUpFragment.disableCloseBtn = true;
+                SignInFragment.disableCloseBtn = true;
+                signInDialog.dismiss();
+                setSignUpFragment = true;
+                startActivity(registerIntent);
+            }
+        });
+        //////// sign dialog
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser ==  null){
+            coupenRedemptionLayout.setVisibility(View.GONE);
+        }else {
+            coupenRedemptionLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     public static void showDialogRecyclerView(){
@@ -353,10 +430,14 @@ public class ProductDetailsActivity extends AppCompatActivity {
             ///todo: search
             return true;
         }else if (id == R.id.main_cart_icon){
-            Intent cartIntent = new Intent(ProductDetailsActivity.this,MainActivity.class);
-            showCart = true;
-            startActivity(cartIntent);
-            return true;
+            if (currentUser == null){
+                signInDialog.show();
+            }else {
+                Intent cartIntent = new Intent(ProductDetailsActivity.this, MainActivity.class);
+                showCart = true;
+                startActivity(cartIntent);
+                return true;
+            }
         }
 
         return super.onOptionsItemSelected(item);

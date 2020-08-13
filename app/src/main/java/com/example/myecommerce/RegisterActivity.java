@@ -32,6 +32,9 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK){ // if else statement for back button of mobile
+            SignUpFragment.disableCloseBtn = false;
+            SignInFragment.disableCloseBtn = false;
+
             if (onResetPasswordFragment){
                 onResetPasswordFragment = false;
                 setFragment(new SignInFragment());

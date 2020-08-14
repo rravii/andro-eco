@@ -275,32 +275,46 @@ public class SignUpFragment extends Fragment {
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                if(task.isSuccessful()){
+                                if(task.isSuccessful()) {
 
-                                    Map<Object,String> userdata = new HashMap<>();
+                                    Map<String, Object> userdata = new HashMap<>();
                                     userdata.put("fullname", fullName.getText().toString());
 
-                                    firebaseFirestore.collection("USERS").add(userdata)
-                                            .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                    firebaseFirestore.collection("USERS").document(firebaseAuth.getUid())
+                                            .set(userdata)
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
-                                                public void onComplete(@NonNull Task<DocumentReference> task) {
-                                                    if(task.isSuccessful()){
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        Map<String, Object> listSize = new HashMap<>();
+                                                        listSize.put("list_size", (long) 0);
+                                                        firebaseFirestore.collection("USERS").document(firebaseAuth.getUid())
+                                                                .collection("USER_DATA")
+                                                                .document("MY_WISHLIST")
+                                                                .set(listSize).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    mainIntent();
+                                                                } else {
+                                                                    progressBar.setVisibility(View.INVISIBLE);
 
-                                                        mainIntent();
+                                                                    // if error found then enabling the button so that after fixing error user can again press it
+                                                                    signUpBtn.setEnabled(true);
+                                                                    signUpBtn.setTextColor(Color.rgb(255, 255, 255));
 
-                                                    }else{
-                                                        progressBar.setVisibility(View.INVISIBLE);
-
-                                                        // if error found then enabling the button so that after fixing error user can again press it
-                                                        signUpBtn.setEnabled(true);
-                                                        signUpBtn.setTextColor(Color.rgb(255,255,255));
-
+                                                                    String error = task.getException().getMessage();
+                                                                    Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show(); // show the error message in toast
+                                                                }
+                                                            }
+                                                        });
+                                                    } else {
                                                         String error = task.getException().getMessage();
                                                         Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show(); // show the error message in toast
                                                     }
                                                 }
                                             });
-                                }else{
+                                }else {
                                     progressBar.setVisibility(View.INVISIBLE);
 
                                     // if error found then enabling the button so that after fixing error user can again press it

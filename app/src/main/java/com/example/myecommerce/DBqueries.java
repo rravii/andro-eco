@@ -35,6 +35,9 @@ public class DBqueries {
     public static List<String> wishList = new ArrayList<>();
     public static List<WishlistModel> wishlistModelList = new ArrayList<>();
 
+    public static List<String> myRatedIds = new ArrayList<>();
+    public static List<Long> myRating = new ArrayList<>();
+
     public static void loadCategories(final RecyclerView categoryRecyclerView, final Context context){
         categoryModelList.clear();
         firebaseFirestore.collection("CATEGORIES").orderBy("index").get()
@@ -200,7 +203,7 @@ public class DBqueries {
         wishList.remove(index);
         Map<String,Object> updateWishlist = new HashMap<>();
 
-        for (int x = 0; x < (long)wishList.size(); x++){
+        for (int x = 0; x < wishList.size(); x++){
             updateWishlist.put("product_ID_" + x, wishList.get(x));
         }
         updateWishlist.put("list_size",(long)wishList.size());
@@ -228,6 +231,40 @@ public class DBqueries {
                 ProductDetailsActivity.running_wishlist_query = false;
             }
         });
+    }
+
+    public static void loadRatingList(final Context context){
+        if (!ProductDetailsActivity.running_rating_query) {
+            ProductDetailsActivity.running_rating_query = true;
+            myRatedIds.clear();
+            myRating.clear();
+
+            firebaseFirestore.collection("USERS").document(FirebaseAuth.getInstance().getUid()).collection("USER_DATA")
+                    .document("MY_RATINGS").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+
+                        for (long x = 0; x < (long) task.getResult().get("list_size"); x++) {
+                            myRatedIds.add(task.getResult().get("product_ID_" + x).toString());
+                            myRating.add((long) task.getResult().get("rating_" + x));
+
+                            if (task.getResult().get("product_ID_" + x).toString().equals(ProductDetailsActivity.productID)) {
+                                ProductDetailsActivity.initialRating = Integer.parseInt(String.valueOf((long) task.getResult().get("rating_" + x))) - 1;
+                                if (ProductDetailsActivity.rateNowContainer != null) {
+                                    ProductDetailsActivity.setRating(ProductDetailsActivity.initialRating);
+                                }
+                            }
+                        }
+
+                    } else {
+                        String error = task.getException().getMessage();
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                    }
+                    ProductDetailsActivity.running_rating_query = false;
+                }
+            });
+        }
     }
 
     public static void clearData(){

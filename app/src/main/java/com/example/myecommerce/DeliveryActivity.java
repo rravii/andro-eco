@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ public class DeliveryActivity extends AppCompatActivity {
     private RecyclerView deliveryRecyclerView;
     private Button changeOrAddNewAddressBtn;
     public static final int SELECT_ADDRESS = 0;
+    private TextView totalAmount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,7 @@ public class DeliveryActivity extends AppCompatActivity {
 
         deliveryRecyclerView = findViewById(R.id.delivery_recyclerview);
         changeOrAddNewAddressBtn = findViewById(R.id.change_or_add_address_btn);
+        totalAmount = findViewById(R.id.total_cart_amount);
 
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -40,12 +43,8 @@ public class DeliveryActivity extends AppCompatActivity {
         deliveryRecyclerView.setLayoutManager(layoutManager);
 
         List<CartItemModel> cartItemModelList = new ArrayList<>();
-        cartItemModelList.add(new CartItemModel(0, R.mipmap.mobile, "Oppo awf", 2, "Rs.2000/-", "Rs. 59999/-", 1, 0, 0));
-        cartItemModelList.add(new CartItemModel(0, R.mipmap.mobile, "Oppo awf", 0, "Rs.2000/-", "Rs. 59999/-", 1, 1, 0));
-        cartItemModelList.add(new CartItemModel(0, R.mipmap.mobile, "Oppo awf", 2, "Rs.2000/-", "Rs. 59999/-", 1, 2, 0));
-        cartItemModelList.add(new CartItemModel(1, "Price (3 items)", "Rs.200000/-", "Free", "Rs. 200000/-", "Rs. 5000/-"));
 
-        CartAdapter cartAdapter =new CartAdapter(cartItemModelList);
+        CartAdapter cartAdapter =new CartAdapter(cartItemModelList, totalAmount);
         deliveryRecyclerView.setAdapter(cartAdapter);
         cartAdapter.notifyDataSetChanged();
 

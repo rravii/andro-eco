@@ -47,16 +47,27 @@
                 android:layout_marginBottom="16dp"
                 app:srcCompat="@mipmap/address" />
 
-            <EditText
-                android:id="@+id/city"
+            <TextView
+                android:id="@+id/textView33"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ems="10"
-                android:layout_marginStart="16dp"
+                android:text="*Currently delivery is available for Kathmandu valley only*"
+                android:gravity="center"
+                android:textStyle="italic"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
                 android:layout_marginEnd="16dp"
-                android:textColor="@color/colorPrimaryDark"
-                android:inputType="textPersonName"
-                android:hint="City*" />
+                android:layout_marginStart="16dp"/>
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/city_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:ems="10"
+                android:background="@drawable/border_background"
+                android:backgroundTint="@color/RecyclerViewBackground"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp" />
 
             <EditText
                 android:id="@+id/locality"

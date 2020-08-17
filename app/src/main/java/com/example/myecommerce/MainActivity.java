@@ -15,6 +15,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
@@ -54,6 +55,8 @@ public class MainActivity extends AppCompatActivity
     private Dialog signInDialog;
     private FirebaseUser currentUser;
     private TextView badgeCount;
+    private int scrollFlags;
+    private AppBarLayout.LayoutParams params;
 
     public static DrawerLayout drawer;
 
@@ -67,6 +70,9 @@ public class MainActivity extends AppCompatActivity
 
         window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
+        params = (AppBarLayout.LayoutParams) toolbar.getLayoutParams();
+        scrollFlags = params.getScrollFlags();
 
         drawer = findViewById(R.id.drawer_layout);
 
@@ -241,6 +247,9 @@ public class MainActivity extends AppCompatActivity
         setFragment(fragment, fragmentNo);
         if (fragmentNo == CART_FRAGMENT) {
             navigationView.getMenu().getItem(3).setChecked(true);
+            params.setScrollFlags(0);
+        }else {
+            params.setScrollFlags(scrollFlags);
         }
     }
 

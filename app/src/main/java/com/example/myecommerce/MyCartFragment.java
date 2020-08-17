@@ -100,15 +100,16 @@ public class MyCartFragment extends Fragment {
             loadingDialog.dismiss();
         }
 
-        cartAdapter = new CartAdapter(DBqueries.cartItemModelList, totalAmount);
+        cartAdapter = new CartAdapter(DBqueries.cartItemModelList, totalAmount, true);
         cartItemsRecyclerView.setAdapter(cartAdapter);
         cartAdapter.notifyDataSetChanged();
 
         continueProceedBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent deliveryIntent = new Intent(getContext(),AddAddressActivity.class); // linking the cart proceed button to Address page
-                getContext().startActivity(deliveryIntent);
+                loadingDialog.show();
+
+                DBqueries.loadAddresses(getContext(),loadingDialog);
             }
         });
 

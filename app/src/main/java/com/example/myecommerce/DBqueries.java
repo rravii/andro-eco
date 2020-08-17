@@ -2,6 +2,7 @@ package com.example.myecommerce;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.view.View;
@@ -42,6 +43,9 @@ public class DBqueries {
 
     public static List<String> cartList = new ArrayList<>();
     public static List<CartItemModel> cartItemModelList = new ArrayList<>();
+
+    public static int selectedAddress = -1;
+    public static List<AddressesModel> addressesModelList = new ArrayList<>();
 
     public static void loadCategories(final RecyclerView categoryRecyclerView, final Context context){
         categoryModelList.clear();
@@ -388,6 +392,45 @@ public class DBqueries {
             }
         });
 
+    }
+
+    public static void loadAddresses(final Context context, final Dialog loadingDialog){
+
+        addressesModelList.clear();
+        firebaseFirestore.collection("USERS").document(FirebaseAuth.getInstance().getUid())
+                .collection("USER_DATA").document("MY_ADDRESSES")
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()){
+
+                    Intent deliveryIntent;
+
+                    if ((long)task.getResult().get("list_size") == 0){
+                        deliveryIntent = new Intent(context,AddAddressActivity.class); // linking the cart proceed button to Address page
+                        deliveryIntent.putExtra("INTENT","deliveryIntent");
+                    }else {
+                        for (long x = 1; x < (long)task.getResult().get("list_size") + 1; x++){
+                            addressesModelList.add(new AddressesModel(task.getResult().get("fullname_" + x).toString(),
+                                    task.getResult().get("address_" + x).toString(),
+                                    task.getResult().get("pincode_" + x).toString(),
+                                    (boolean)task.getResult().get("selected_" + x)));
+
+                            if ((boolean)task.getResult().get("selected_" + x)){
+                                selectedAddress = Integer.parseInt(String.valueOf(x - 1));
+                            }
+                        }
+                        deliveryIntent = new Intent(context,DeliveryActivity.class); // if address present linking the cart proceed button to Delivery page
+                    }
+                    context.startActivity(deliveryIntent);
+
+                }else {
+                    String error = task.getException().getMessage();
+                    Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                }
+                loadingDialog.dismiss();
+            }
+        });
     }
 
     public static void clearData(){

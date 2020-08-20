@@ -3,18 +3,34 @@ package com.example.myecommerce;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
+import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.esewa.android.sdk.payment.ESewaConfiguration;
+import com.esewa.android.sdk.payment.ESewaPayment;
+import com.esewa.android.sdk.payment.ESewaPaymentActivity;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class DeliveryActivity extends AppCompatActivity {
 
@@ -26,6 +42,25 @@ public class DeliveryActivity extends AppCompatActivity {
     private TextView fullname;
     private TextView fullAddress;
     private TextView pincode;
+    private Button continueProceedBtn;
+    private Dialog loadingDialog;
+    private Dialog paymentMethodDialog;
+    private ImageButton esewa;
+    private ConstraintLayout orderConfirmationLayout;
+    private ImageButton continueShoppingBtn;
+    private TextView orderId;
+
+    /////payment
+
+    private static final String CONFIG_ENVIRONMENT = ESewaConfiguration.ENVIRONMENT_TEST;
+    private static final int REQUEST_CODE_PAYMENT = 1;
+
+    private static final String M_id = "JB0BBQ4aD0UqIThFJwAKBgAXEUkEGQUBBAwdOgABHD4DChwUAB0R";
+    private static final String M_secret_key = "BhwIWQQADhIYSxILExMcAgFXFhcOBwAKBgAXEQ==";
+    private static final String customer_id = FirebaseAuth.getInstance().getUid();
+    private static final String order_id = UUID.randomUUID().toString().substring(0,28);
+
+    /////payment
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +78,27 @@ public class DeliveryActivity extends AppCompatActivity {
         fullname = findViewById(R.id.fullname);
         fullAddress = findViewById(R.id.address);
         pincode = findViewById(R.id.pincode);
+        continueProceedBtn = findViewById(R.id.cart_continue_proceed_btn);
+        orderConfirmationLayout = findViewById(R.id.order_confirmation_layout);
+        continueShoppingBtn = findViewById(R.id.continue_shopping_btn);
+        orderId = findViewById(R.id.order_id);
 
+        ////// loading dialog
+        loadingDialog = new Dialog(DeliveryActivity.this);
+        loadingDialog.setContentView(R.layout.loading_progress_dialog);
+        loadingDialog.setCancelable(false);
+        loadingDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.slider_background));
+        loadingDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+        ////// loading dialog
+
+        ////// loading dialog
+        paymentMethodDialog = new Dialog(DeliveryActivity.this);
+        paymentMethodDialog.setContentView(R.layout.payment_method);
+        paymentMethodDialog.setCancelable(true);
+        paymentMethodDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.slider_background));
+        paymentMethodDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+        esewa = paymentMethodDialog.findViewById(R.id.esewa);
+        ////// loading dialog
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -62,6 +117,73 @@ public class DeliveryActivity extends AppCompatActivity {
                 startActivity(myAddressesIntent);
             }
         });
+
+        continueProceedBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                paymentMethodDialog.show();
+            }
+        });
+
+        esewa.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                paymentMethodDialog.dismiss();
+                loadingDialog.show();
+
+                ESewaConfiguration eSewaConfiguration = new ESewaConfiguration()
+                        .clientId(M_id)
+                        .secretKey(M_secret_key)
+                        .environment(CONFIG_ENVIRONMENT);
+
+                ESewaPayment eSewaPayment = new ESewaPayment(totalAmount.getText().toString().substring(3, totalAmount.getText().length() - 2), customer_id, order_id, null);
+
+                Intent intent = new Intent(DeliveryActivity.this, ESewaPaymentActivity.class);
+                intent.putExtra(ESewaConfiguration.ESEWA_CONFIGURATION, eSewaConfiguration);
+
+                intent.putExtra(ESewaPayment.ESEWA_PAYMENT, eSewaPayment);
+                startActivityForResult(intent, REQUEST_CODE_PAYMENT);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_PAYMENT) {
+            if (resultCode == RESULT_OK) {
+                String s = data.getStringExtra(ESewaPayment.EXTRA_RESULT_MESSAGE);
+                Log.i("Proof of Payment", s);
+                Toast.makeText(this, "SUCCESSFUL PAYMENT", Toast.LENGTH_SHORT).show();
+                loadingDialog.dismiss();
+
+                if (MainActivity.mainActivity != null){
+                    MainActivity.mainActivity.finish();
+                    MainActivity.mainActivity = null;
+                    MainActivity.showCart = false;
+                }
+                if (ProductDetailsActivity.productDetailsActivity != null){
+                    ProductDetailsActivity.productDetailsActivity.finish();
+                    ProductDetailsActivity.productDetailsActivity  = null;
+                }
+
+                orderId.setText("Order ID " + order_id);
+                orderConfirmationLayout.setVisibility(View.VISIBLE);
+
+                continueShoppingBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        finish();
+                    }
+                });
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "Canceled By User", Toast.LENGTH_SHORT).show();
+                loadingDialog.dismiss();
+            } else if (resultCode == ESewaPayment.RESULT_EXTRAS_INVALID) {
+                String s = data.getStringExtra(ESewaPayment.EXTRA_RESULT_MESSAGE);
+                Log.i("Proof of Payment", s);
+            }
+        }
     }
 
     @Override
@@ -85,4 +207,10 @@ public class DeliveryActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        loadingDialog.dismiss();
+//    }
 }

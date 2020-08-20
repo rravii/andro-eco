@@ -1,5 +1,6 @@
 package com.example.myecommerce;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity
     private static final int REWARDS_FRAGMENT = 4;
     private static final int ACCOUNT_FRAGMENT = 5;
     public static Boolean showCart = false;
+    public static Activity mainActivity;
 
     private FrameLayout frameLayout;
     private ImageView actionBarLogo;
@@ -84,6 +86,7 @@ public class MainActivity extends AppCompatActivity
         frameLayout = findViewById(R.id.main_framelayout);
 
         if (showCart) {
+            mainActivity = this;
             drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);// here 1 means drawer is locked
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             gotoFragment("My Cart", new MyCartFragment(), -2);
@@ -154,6 +157,7 @@ public class MainActivity extends AppCompatActivity
                 super.onBackPressed();
             }else{
                 if (showCart){
+                    mainActivity = null;
                     showCart = false;
                     finish();
                 }else {
@@ -230,6 +234,7 @@ public class MainActivity extends AppCompatActivity
             return true;
         } else if (id == android.R.id.home){
             if (showCart){
+                mainActivity = null;
                 showCart = false;
                 finish();
                 return true;

@@ -27,6 +27,9 @@ public class CartItemModel {
     private Long coupensApplied;
     private boolean inStock;
 
+    private String selectedCoupenId;
+    private String discountedPrice;
+
     public CartItemModel(int type, String productID, String productImage, String productTitle, Long freeCoupens, String productPrice, String cuttedPrice, Long productQuantity, Long offersApplied, Long coupensApplied, boolean inStock) {
         this.type = type;
         this.productID = productID;
@@ -39,6 +42,22 @@ public class CartItemModel {
         this.offersApplied = offersApplied;
         this.coupensApplied = coupensApplied;
         this.inStock = inStock;
+    }
+
+    public String getDiscountedPrice() {
+        return discountedPrice;
+    }
+
+    public void setDiscountedPrice(String discountedPrice) {
+        this.discountedPrice = discountedPrice;
+    }
+
+    public String getSelectedCoupenId() {
+        return selectedCoupenId;
+    }
+
+    public void setSelectedCoupenId(String selectedCoupenId) {
+        this.selectedCoupenId = selectedCoupenId;
     }
 
     public boolean isInStock() {

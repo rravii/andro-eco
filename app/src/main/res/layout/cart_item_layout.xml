@@ -96,8 +96,9 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:text="Offers applied"
-        android:textSize="12sp"
         android:textColor="@color/successBlue"
+        android:textSize="12sp"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/product_price" />
 
@@ -109,6 +110,7 @@
         android:text="Coupens applied"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="12sp"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/offers_applied" />
 
@@ -133,7 +135,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:background="#17202A"
+        android:background="@color/coupenDarkBlue"
         android:gravity="right"
         android:orientation="horizontal"
         android:padding="16dp"
@@ -146,7 +148,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Check price after coupen redemption"
+            android:text="Apply your coupen here."
             android:textAlignment="center"
             android:textColor="@color/colorAccent" />
 

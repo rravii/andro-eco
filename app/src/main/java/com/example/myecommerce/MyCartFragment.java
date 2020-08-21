@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -134,5 +135,46 @@ public class MyCartFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        cartAdapter.notifyDataSetChanged();
+
+        if (DBqueries.rewardModelList.size() == 0) {
+            loadingDialog.show();
+            DBqueries.loadRewards(getContext(), loadingDialog, false);
+        }
+
+//        if (DBqueries.cartItemModelList.size() == 0) {
+//            DBqueries.cartList.clear();
+//            DBqueries.loadCartList(getContext(),loadingDialog,true,new TextView(getContext()),totalAmount);
+//        }else {
+//            //// other code
+//
+//            //// other code
+//            loadingDialog.dismiss();
+//        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        for (CartItemModel cartItemModel : DBqueries.cartItemModelList){
+            if (!TextUtils.isEmpty(cartItemModel.getSelectedCoupenId())){
+                for (RewardModel rewardModel : DBqueries.rewardModelList) {
+                    if (rewardModel.getCoupenId().equals(cartItemModel.getSelectedCoupenId())){
+                        rewardModel.setAlreadyUsed(false);
+                    }
+                }
+                cartItemModel.setSelectedCoupenId(null);
+                if (MyRewardsFragment.myRewardsAdapter != null) {
+                    MyRewardsFragment.myRewardsAdapter.notifyDataSetChanged();
+                }
+            }
+        }
+
     }
 }

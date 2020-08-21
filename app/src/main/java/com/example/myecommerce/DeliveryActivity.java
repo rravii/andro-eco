@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -43,7 +44,7 @@ public class DeliveryActivity extends AppCompatActivity {
     private TextView fullAddress;
     private TextView pincode;
     private Button continueProceedBtn;
-    private Dialog loadingDialog;
+    public static Dialog loadingDialog;
     private Dialog paymentMethodDialog;
     private ImageButton esewa;
     private ConstraintLayout orderConfirmationLayout;
@@ -66,6 +67,9 @@ public class DeliveryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_delivery);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -121,6 +125,10 @@ public class DeliveryActivity extends AppCompatActivity {
         continueProceedBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+//                Boolean allProductsAvailable = false;
+//                for (CartItemModel cartItemModel : cartItemModelList){
+//
+//                }
                 paymentMethodDialog.show();
             }
         });

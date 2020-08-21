@@ -16,6 +16,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -24,6 +25,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +49,8 @@ public class DBqueries {
 
     public static int selectedAddress = -1;
     public static List<AddressesModel> addressesModelList = new ArrayList<>();
+
+    public static List<RewardModel> rewardModelList = new ArrayList<>();
 
     public static void loadCategories(final RecyclerView categoryRecyclerView, final Context context){
         categoryModelList.clear();
@@ -317,7 +321,7 @@ public class DBqueries {
                                                 task.getResult().get("product_price").toString(),
                                                 task.getResult().get("cutted_price").toString(),
                                                 (long) 1,
-                                                (long) 0,
+                                                (long) task.getResult().get("offers_applied"),// documentSnapshot
                                                 (long) 0,
                                                 (boolean)task.getResult().get("in_stock")));
 
@@ -439,6 +443,70 @@ public class DBqueries {
         });
     }
 
+    public static void loadRewards(final Context context, final Dialog loadingDialog, final Boolean onRewardFragment ){
+
+        rewardModelList.clear();
+
+        firebaseFirestore.collection("USERS").document(FirebaseAuth.getInstance().getUid()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()){
+                            final Date lastseenDate = task.getResult().getDate("Last seen");
+
+                            firebaseFirestore.collection("USERS").document(FirebaseAuth.getInstance().getUid()).collection("USER_REWARDS")
+                                    .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()){
+
+                                        for (QueryDocumentSnapshot documentSnapshot : task.getResult()){
+                                            if (documentSnapshot.get("type").toString().equals("Discount") && lastseenDate.before(documentSnapshot.getDate("validity"))) {
+                                                rewardModelList.add(new RewardModel(documentSnapshot.getId(),
+                                                        documentSnapshot.get("type").toString(),
+                                                        documentSnapshot.get("lower_limit").toString(),
+                                                        documentSnapshot.get("upper_limit").toString(),
+                                                        documentSnapshot.get("percentage").toString(),
+                                                        documentSnapshot.get("body").toString(),
+                                                        documentSnapshot.getTimestamp("validity").toDate(),
+                                                        (Boolean) documentSnapshot.get("already_used")
+                                                ));
+                                            }else if (documentSnapshot.get("type").toString().equals("Flat Rs.* OFF") && lastseenDate.before(documentSnapshot.getDate("validity"))){
+                                                rewardModelList.add(new RewardModel(documentSnapshot.getId(),
+                                                        documentSnapshot.get("type").toString(),
+                                                        documentSnapshot.get("lower_limit").toString(),
+                                                        documentSnapshot.get("upper_limit").toString(),
+                                                        documentSnapshot.get("amount").toString(),
+                                                        documentSnapshot.get("body").toString(),
+                                                        documentSnapshot.getTimestamp("validity").toDate(),
+                                                        (Boolean) documentSnapshot.get("already_used")
+                                                ));
+                                            }
+                                        }
+                                        if (onRewardFragment) {
+                                            MyRewardsFragment.myRewardsAdapter.notifyDataSetChanged();// refreshing the adapter
+                                        }
+
+                                    }else {
+                                        String error = task.getException().getMessage();
+                                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                                    }
+                                    loadingDialog.dismiss();
+                                }
+                            });
+                        }else {
+                            loadingDialog.dismiss();
+                            String error = task.getException().getMessage();
+                            Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+
+
+
+    }
+
     public static void clearData(){
         categoryModelList.clear();
         lists.clear();
@@ -447,5 +515,9 @@ public class DBqueries {
         wishlistModelList.clear();
         cartList.clear();
         cartItemModelList.clear();
+        myRatedIds.clear();
+        myRating.clear();
+        addressesModelList.clear();
+        rewardModelList.clear();
     }
 }

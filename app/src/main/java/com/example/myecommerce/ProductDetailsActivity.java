@@ -435,7 +435,8 @@ public class ProductDetailsActivity extends AppCompatActivity {
                                                     (long) documentSnapshot.get("total_ratings"),
                                                     documentSnapshot.get("product_price").toString(),
                                                     documentSnapshot.get("cutted_price").toString(),
-                                                    (boolean) documentSnapshot.get("COD")));
+                                                    (boolean) documentSnapshot.get("COD"),
+                                                    (boolean) documentSnapshot.get("in_stock")));
                                         }
 
                                         ALREADY_ADDED_TO_WISHLIST = true;
@@ -611,6 +612,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
                 if (currentUser == null){
                     signInDialog.show();
                 }else {
+                    DeliveryActivity.fromCart = false;
                     loadingDialog.show();
                     productDetailsActivity = ProductDetailsActivity.this;
                     DeliveryActivity.cartItemModelList = new ArrayList<>();

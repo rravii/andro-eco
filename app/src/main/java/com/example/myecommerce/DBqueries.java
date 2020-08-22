@@ -117,7 +117,8 @@ public class DBqueries {
                                                 (long)documentSnapshot.get("total_ratings_" + x),
                                                 documentSnapshot.get("product_price_" + x).toString(),
                                                 documentSnapshot.get("cutted_price_" + x).toString(),
-                                                (boolean)documentSnapshot.get("COD_" + x)));
+                                                (boolean)documentSnapshot.get("COD_" + x),
+                                                (boolean)documentSnapshot.get("in_stock_" + x)));
                                     }
                                     lists.get(index).add(new HomePageModel(2,documentSnapshot.get("layout_title").toString(),
                                             documentSnapshot.get("layout_background").toString(),
@@ -191,7 +192,8 @@ public class DBqueries {
                                                 (long) task.getResult().get("total_ratings"),
                                                 task.getResult().get("product_price").toString(),
                                                 task.getResult().get("cutted_price").toString(),
-                                                (boolean) task.getResult().get("COD")));
+                                                (boolean) task.getResult().get("COD"),
+                                                (boolean) task.getResult().get("in_stock")));
 
                                         MyWishlistFragment.wishlistAdapter.notifyDataSetChanged();
                                     } else {
@@ -424,7 +426,8 @@ public class DBqueries {
                             addressesModelList.add(new AddressesModel(task.getResult().get("fullname_" + x).toString(),
                                     task.getResult().get("address_" + x).toString(),
                                     task.getResult().get("pincode_" + x).toString(),
-                                    (boolean)task.getResult().get("selected_" + x)));
+                                    (boolean)task.getResult().get("selected_" + x),
+                                    task.getResult().get("mobile_no_" + x).toString()));
 
                             if ((boolean)task.getResult().get("selected_" + x)){
                                 selectedAddress = Integer.parseInt(String.valueOf(x - 1));

@@ -27,10 +27,15 @@ import android.widget.Toast;
 import com.esewa.android.sdk.payment.ESewaConfiguration;
 import com.esewa.android.sdk.payment.ESewaPayment;
 import com.esewa.android.sdk.payment.ESewaPaymentActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class DeliveryActivity extends AppCompatActivity {
@@ -41,15 +46,19 @@ public class DeliveryActivity extends AppCompatActivity {
     public static final int SELECT_ADDRESS = 0;
     private TextView totalAmount;
     private TextView fullname;
+    private String name,mobileNo;
     private TextView fullAddress;
     private TextView pincode;
     private Button continueProceedBtn;
     public static Dialog loadingDialog;
     private Dialog paymentMethodDialog;
-    private ImageButton esewa;
+    private ImageButton esewa, cod;
     private ConstraintLayout orderConfirmationLayout;
     private ImageButton continueShoppingBtn;
     private TextView orderId;
+    private boolean successResponse = false;
+    public static boolean fromCart;
+    public static boolean codOrderConfirmed = false;
 
     /////payment
 
@@ -95,14 +104,15 @@ public class DeliveryActivity extends AppCompatActivity {
         loadingDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
         ////// loading dialog
 
-        ////// loading dialog
+        ////// payment dialog
         paymentMethodDialog = new Dialog(DeliveryActivity.this);
         paymentMethodDialog.setContentView(R.layout.payment_method);
         paymentMethodDialog.setCancelable(true);
         paymentMethodDialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.slider_background));
         paymentMethodDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
         esewa = paymentMethodDialog.findViewById(R.id.esewa);
-        ////// loading dialog
+        cod = paymentMethodDialog.findViewById(R.id.cod_btn);
+        ////// payment dialog
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -130,6 +140,16 @@ public class DeliveryActivity extends AppCompatActivity {
 //
 //                }
                 paymentMethodDialog.show();
+            }
+        });
+
+        cod.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                paymentMethodDialog.dismiss();
+                Intent otpIntent = new Intent(DeliveryActivity.this,OTPverificationActivity.class);
+                otpIntent.putExtra("mobileNo",mobileNo.substring(0,10));
+                startActivity(otpIntent);
             }
         });
 
@@ -163,27 +183,10 @@ public class DeliveryActivity extends AppCompatActivity {
                 String s = data.getStringExtra(ESewaPayment.EXTRA_RESULT_MESSAGE);
                 Log.i("Proof of Payment", s);
                 Toast.makeText(this, "SUCCESSFUL PAYMENT", Toast.LENGTH_SHORT).show();
-                loadingDialog.dismiss();
 
-                if (MainActivity.mainActivity != null){
-                    MainActivity.mainActivity.finish();
-                    MainActivity.mainActivity = null;
-                    MainActivity.showCart = false;
-                }
-                if (ProductDetailsActivity.productDetailsActivity != null){
-                    ProductDetailsActivity.productDetailsActivity.finish();
-                    ProductDetailsActivity.productDetailsActivity  = null;
-                }
-
-                orderId.setText("Order ID " + order_id);
-                orderConfirmationLayout.setVisibility(View.VISIBLE);
-
-                continueShoppingBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        finish();
-                    }
-                });
+                /// mycode
+                showConfirmationLayout();
+                /// mycode
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "Canceled By User", Toast.LENGTH_SHORT).show();
                 loadingDialog.dismiss();
@@ -197,9 +200,15 @@ public class DeliveryActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        fullname.setText(DBqueries.addressesModelList.get(DBqueries.selectedAddress).getFullname());
+        name = DBqueries.addressesModelList.get(DBqueries.selectedAddress).getFullname();
+        mobileNo = DBqueries.addressesModelList.get(DBqueries.selectedAddress).getMobileNo();
+        fullname.setText(name + " - " + mobileNo);
         fullAddress.setText(DBqueries.addressesModelList.get(DBqueries.selectedAddress).getAddress());
         pincode.setText(DBqueries.addressesModelList.get(DBqueries.selectedAddress).getPincode());
+
+        if (codOrderConfirmed){
+            showConfirmationLayout();
+        }
     }
 
     @Override
@@ -216,9 +225,83 @@ public class DeliveryActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        loadingDialog.dismiss();
-//    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        loadingDialog.dismiss();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (successResponse){
+            finish();
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    private void showConfirmationLayout(){
+        successResponse = true;
+        codOrderConfirmed = false;
+
+        if (MainActivity.mainActivity != null){
+            MainActivity.mainActivity.finish();
+            MainActivity.mainActivity = null;
+            MainActivity.showCart = false;
+        }
+        if (ProductDetailsActivity.productDetailsActivity != null){
+            ProductDetailsActivity.productDetailsActivity.finish();
+            ProductDetailsActivity.productDetailsActivity  = null;
+        }
+
+        if (fromCart){
+            loadingDialog.show();
+
+            Map<String,Object> updateCartList = new HashMap<>();
+            long cartListSize = 0;
+            final List<Integer> indexList = new ArrayList<>();
+
+            for (int x = 0; x < DBqueries.cartList.size(); x++){
+                if (!cartItemModelList.get(x).isInStock()){
+                    updateCartList.put("product_ID_" + cartListSize, cartItemModelList.get(x).getProductID());
+                    cartListSize++;
+                }else {
+                    indexList.add(x);
+                }
+            }
+            updateCartList.put("list_size", cartListSize);
+
+            FirebaseFirestore.getInstance().collection("USERS").document(FirebaseAuth.getInstance().getUid())
+                    .collection("USER_DATA").document("MY_CART")
+                    .set(updateCartList).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()){
+                        for (int x = 0; x < indexList.size(); x++){
+                            DBqueries.cartList.remove(indexList.get(x).intValue());
+                            DBqueries.cartItemModelList.remove(indexList.get(x).intValue());
+                            DBqueries.cartItemModelList.remove(DBqueries.cartItemModelList.size() - 1);
+                        }
+                    }else {
+                        String error = task.getException().getMessage();
+                        Toast.makeText(DeliveryActivity.this, error, Toast.LENGTH_SHORT).show();
+                    }
+                    loadingDialog.dismiss();
+                }
+            });
+        }
+
+        continueProceedBtn.setEnabled(false);
+        changeOrAddNewAddressBtn.setEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false); // actionbar back arrow key disabled
+        orderId.setText("Order ID " + order_id);
+        orderConfirmationLayout.setVisibility(View.VISIBLE);
+
+        continueShoppingBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+    }
 }

@@ -109,7 +109,7 @@
         android:layout_height="match_parent"
         android:background="@color/colorAccent"
         android:translationZ="8dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -127,7 +127,7 @@
 
             <com.airbnb.lottie.LottieAnimationView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="100dp"
                 android:layout_gravity="center"
                 android:layout_margin="16dp"
                 app:lottie_autoPlay="true"

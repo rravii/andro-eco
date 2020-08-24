@@ -48,13 +48,13 @@ public class OTPverificationActivity extends AppCompatActivity {
 //            @Override
 //            public void onResponse(String response) {
 
-                verifyBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        DeliveryActivity.codOrderConfirmed = true;
-                        finish();
-                    }
-                });
+//                verifyBtn.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        DeliveryActivity.codOrderConfirmed = true;
+//                        finish();
+//                    }
+//                });
 
 //            }
 //        }, new Response.ErrorListener() {

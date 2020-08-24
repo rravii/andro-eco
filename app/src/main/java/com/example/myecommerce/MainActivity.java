@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity
     private static final int ACCOUNT_FRAGMENT = 5;
     public static Boolean showCart = false;
     public static Activity mainActivity;
+    public static boolean resetMainActivity = false;
 
     private FrameLayout frameLayout;
     private ImageView actionBarLogo;
@@ -142,6 +143,12 @@ public class MainActivity extends AppCompatActivity
             navigationView.getMenu().getItem(navigationView.getMenu().size() - 1).setEnabled(false);// sign out button disable
         }else {
             navigationView.getMenu().getItem(navigationView.getMenu().size() - 1).setEnabled(true);// sign out button enable
+        }
+        if (resetMainActivity){
+            resetMainActivity = false;
+            actionBarLogo.setVisibility(View.VISIBLE);
+            setFragment(new HomeFragment(), HOME_FRAGMENT);
+            navigationView.getMenu().getItem(0).setChecked(true);
         }
         invalidateOptionsMenu(); // refresh the toolbar
     }

@@ -140,6 +140,12 @@ public class CartAdapter extends RecyclerView.Adapter {
                     totalAmount = totalItemPrice + 60;
                 }
 
+                cartItemModelList.get(position).setTotalItems(totalItems);
+                cartItemModelList.get(position).setTotalItemPrice(totalItemPrice);
+                cartItemModelList.get(position).setDeliveryPrice(deliveryPrice);
+                cartItemModelList.get(position).setTotalAmount(totalAmount);
+                cartItemModelList.get(position).setSavedAmount(savedAmount);
+
                 ((CartTotalAmountViewHolder) viewHolder).setTotalAmount(totalItems,totalItemPrice,deliveryPrice,totalAmount,savedAmount);
                 break;
             default:

@@ -165,57 +165,18 @@ public class DeliveryActivity extends AppCompatActivity {
         cod.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getQtyIDs = false;
-                paymentMethodDialog.dismiss();
-                Intent otpIntent = new Intent(DeliveryActivity.this,OTPverificationActivity.class);
-                otpIntent.putExtra("mobileNo",mobileNo.substring(0,10));
-                startActivity(otpIntent);
+                paymentMethod = "COD";
+                placeOrderDetails();
             }
         });
 
         esewa.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getQtyIDs = false;
-                paymentMethodDialog.dismiss();
-                loadingDialog.show();
-
-                ESewaConfiguration eSewaConfiguration = new ESewaConfiguration()
-                        .clientId(M_id)
-                        .secretKey(M_secret_key)
-                        .environment(CONFIG_ENVIRONMENT);
-
-                ESewaPayment eSewaPayment = new ESewaPayment(totalAmount.getText().toString().substring(3, totalAmount.getText().length() - 2), customer_id, order_id, null);
-
-                Intent intent = new Intent(DeliveryActivity.this, ESewaPaymentActivity.class);
-                intent.putExtra(ESewaConfiguration.ESEWA_CONFIGURATION, eSewaConfiguration);
-
-                intent.putExtra(ESewaPayment.ESEWA_PAYMENT, eSewaPayment);
-                startActivityForResult(intent, REQUEST_CODE_PAYMENT);
+                paymentMethod = "ESEWA";
+                placeOrderDetails();
             }
         });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_PAYMENT) {
-            if (resultCode == RESULT_OK) {
-                String s = data.getStringExtra(ESewaPayment.EXTRA_RESULT_MESSAGE);
-                Log.i("Proof of Payment", s);
-                Toast.makeText(this, "SUCCESSFUL PAYMENT", Toast.LENGTH_SHORT).show();
-
-                /// mycode
-                showConfirmationLayout();
-                /// mycode
-            } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "Canceled By User", Toast.LENGTH_SHORT).show();
-                loadingDialog.dismiss();
-            } else if (resultCode == ESewaPayment.RESULT_EXTRAS_INVALID) {
-                String s = data.getStringExtra(ESewaPayment.EXTRA_RESULT_MESSAGE);
-                Log.i("Proof of Payment", s);
-            }
-        }
     }
 
     @Override
@@ -381,7 +342,6 @@ public class DeliveryActivity extends AppCompatActivity {
                         .collection("QUANTITY").document(qtyID).update("user_ID", FirebaseAuth.getInstance().getUid());
 
             }
-
         }
 
         if (MainActivity.mainActivity != null){
@@ -453,44 +413,166 @@ public class DeliveryActivity extends AppCompatActivity {
         });
     }
 
-//    private void placeOrderDetails(){
-//
-//        String userID = FirebaseAuth.getInstance().getUid();
-//        loadingDialog.show();
-//        for (CartItemModel cartItemModel : cartItemModelList) {
-//            if (cartItemModel.getType() == CartItemModel.CART_ITEM) {
-//
-//                Map<Object,Object> orderDetails = new HashMap<>();
-//                orderDetails.put("ORDER ID", order_id);
-//                orderDetails.put("Product Id", cartItemModel.getProductID());
-//                orderDetails.put("User Id", userID);
-//                orderDetails.put("Product Quantity", cartItemModel.getProductQuantity());
-//                orderDetails.put("Cutted Price", cartItemModel.getCuttedPrice());
-//                orderDetails.put("Product Price", cartItemModel.getProductPrice());
-//                orderDetails.put("Coupen Id", cartItemModel.getSelectedCoupenId());
-//                orderDetails.put("Discounted Price", cartItemModel.getDiscountedPrice());
-//                orderDetails.put("Date", FieldValue.serverTimestamp());
-//                orderDetails.put("Payment Method", paymentMethod);
-//                orderDetails.put("Address", fullAddress.getText());
-//                orderDetails.put("FullName", fullname.getText());
-//                orderDetails.put("Pincode", pincode.getText());
-//                orderDetails.put("Payment Status", "not Paid");
-//                orderDetails.put("Order Status", "Ordered");
-//                orderDetails.put("Free Coupens", cartItemModel.getFreeCoupens());
-//
-//                firebaseFirestore.collection("ORDERS").document(order_id).collection("OrderItems").document(cartItemModel.getProductID())
-//                        .set(orderDetails).addOnCompleteListener(new OnCompleteListener<Void>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Void> task) {
-//                        if (task.isSuccessful()){
-//
-//                        }else {
-//
-//                        }
-//                    }
-//                });
-//            }
-//        }
-//
-//    }
+    private void placeOrderDetails(){
+
+        String userID = FirebaseAuth.getInstance().getUid();
+        loadingDialog.show();
+        for (CartItemModel cartItemModel : cartItemModelList) {
+            if (cartItemModel.getType() == CartItemModel.CART_ITEM) {
+
+                Map<String,Object> orderDetails = new HashMap<>();
+                orderDetails.put("ORDER ID", order_id);
+                orderDetails.put("Product Id", cartItemModel.getProductID());
+                orderDetails.put("Product Image", cartItemModel.getProductImage());
+                orderDetails.put("Product Title", cartItemModel.getProductTitle());
+                orderDetails.put("User Id", userID);
+                orderDetails.put("Product Quantity", cartItemModel.getProductQuantity());
+                if (cartItemModel.getCuttedPrice() != null) {
+                    orderDetails.put("Cutted Price", cartItemModel.getCuttedPrice());
+                }else {
+                    orderDetails.put("Cutted Price", "");
+                }
+                orderDetails.put("Product Price", cartItemModel.getProductPrice());
+                if (cartItemModel.getSelectedCoupenId() != null) {
+                    orderDetails.put("Coupen Id", cartItemModel.getSelectedCoupenId());
+                }else {
+                    orderDetails.put("Coupen Id", "");
+                }
+                if (cartItemModel.getDiscountedPrice() != null) {
+                    orderDetails.put("Discounted Price", cartItemModel.getDiscountedPrice());
+                }else {
+                    orderDetails.put("Discounted Price", "");
+                }
+                orderDetails.put("Ordered date", FieldValue.serverTimestamp());
+                orderDetails.put("Packed date", FieldValue.serverTimestamp());
+                orderDetails.put("Shipped date", FieldValue.serverTimestamp());
+                orderDetails.put("Delivered date", FieldValue.serverTimestamp());
+                orderDetails.put("Cancelled date", FieldValue.serverTimestamp());
+                orderDetails.put("Order Status", "Ordered");
+                orderDetails.put("Payment Method", paymentMethod);
+                orderDetails.put("Address", fullAddress.getText());
+                orderDetails.put("FullName", fullname.getText());
+                orderDetails.put("Pincode", pincode.getText());
+                orderDetails.put("Free Coupens", cartItemModel.getFreeCoupens());
+
+                firebaseFirestore.collection("ORDERS").document(order_id).collection("OrderItems").document(cartItemModel.getProductID())
+                        .set(orderDetails).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (!task.isSuccessful()){
+                            String error = task.getException().getMessage();
+                            Toast.makeText(DeliveryActivity.this, error, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }else {
+                Map<String,Object> orderDetails = new HashMap<>();
+                orderDetails.put("Total Items", cartItemModel.getTotalItems());
+                orderDetails.put("Total Items Price", cartItemModel.getTotalItemPrice());
+                orderDetails.put("Delivery Price", cartItemModel.getDeliveryPrice());
+                orderDetails.put("Total Amount", cartItemModel.getTotalAmount());
+                orderDetails.put("Saved Amount", cartItemModel.getSavedAmount());
+                orderDetails.put("Payment Status", "not Paid");
+                orderDetails.put("Order Status", "Cancelled");
+
+                firebaseFirestore.collection("ORDERS").document(order_id).set(orderDetails).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+
+                            if (paymentMethod.equals("ESEWA")){
+                                esewa();
+                            }else {
+                                cod();
+                            }
+
+                        }else {
+                            String error = task.getException().getMessage();
+                            Toast.makeText(DeliveryActivity.this, error, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+            }
+        }
+
+    }
+
+    private void esewa(){
+
+        getQtyIDs = false;
+        paymentMethodDialog.dismiss();
+        loadingDialog.show();
+
+        ESewaConfiguration eSewaConfiguration = new ESewaConfiguration()
+                .clientId(M_id)
+                .secretKey(M_secret_key)
+                .environment(CONFIG_ENVIRONMENT);
+
+        ESewaPayment eSewaPayment = new ESewaPayment(totalAmount.getText().toString().substring(3, totalAmount.getText().length() - 2), customer_id, order_id, null);
+
+        Intent intent = new Intent(DeliveryActivity.this, ESewaPaymentActivity.class);
+        intent.putExtra(ESewaConfiguration.ESEWA_CONFIGURATION, eSewaConfiguration);
+
+        intent.putExtra(ESewaPayment.ESEWA_PAYMENT, eSewaPayment);
+        startActivityForResult(intent, REQUEST_CODE_PAYMENT);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_PAYMENT) {
+            if (resultCode == RESULT_OK) {
+                String s = data.getStringExtra(ESewaPayment.EXTRA_RESULT_MESSAGE);
+                Log.i("Proof of Payment", s);
+                Toast.makeText(this, "SUCCESSFUL PAYMENT", Toast.LENGTH_SHORT).show();
+
+                /// mycode
+                Map<String,Object> updateStatus = new HashMap<>();
+                updateStatus.put("Payment Status", "Paid");
+                updateStatus.put("Order Status", "Ordered");
+
+                firebaseFirestore.collection("ORDERS").document(order_id).update(updateStatus)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()){
+                                    Map<String, Object> userOrder = new HashMap<>();
+                                    userOrder.put("order_id", order_id);
+                                    firebaseFirestore.collection("USERS").document(FirebaseAuth.getInstance().getUid()).collection("USER_ORDERS")
+                                            .document(order_id).set(userOrder).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()){
+                                                showConfirmationLayout();
+                                            }else {
+                                                Toast.makeText(DeliveryActivity.this, "Failed to update user's OrderList", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                                }else {
+                                    Toast.makeText(DeliveryActivity.this, "Order CANCELLED", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                /// mycode
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "Canceled By User", Toast.LENGTH_SHORT).show();
+                loadingDialog.dismiss();
+            } else if (resultCode == ESewaPayment.RESULT_EXTRAS_INVALID) {
+                String s = data.getStringExtra(ESewaPayment.EXTRA_RESULT_MESSAGE);
+                Log.i("Proof of Payment", s);
+            }
+        }
+    }
+
+    private void cod(){
+        getQtyIDs = false;
+        paymentMethodDialog.dismiss();
+        Intent otpIntent = new Intent(DeliveryActivity.this,OTPverificationActivity.class);
+        otpIntent.putExtra("mobileNo",mobileNo.substring(0,10));
+        otpIntent.putExtra("OrderID",order_id);
+        startActivity(otpIntent);
+    }
 }

@@ -73,15 +73,12 @@ public class MyOrdersFragment extends Fragment {
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         myOrdersRecyclerView.setLayoutManager(layoutManager);
 
-        List<MyOrderItemModel> myOrderItemModelList = new ArrayList<>();
-        myOrderItemModelList.add(new MyOrderItemModel(R.mipmap.mobile, 2,"Oppo awf(BLACK)", "Delivered on Mon,15th JAN 2020"));
-        myOrderItemModelList.add(new MyOrderItemModel(R.mipmap.cart_black, 5,"Oppo awf(BLACK)", "Delivered on Mon,15th JAN 2020"));
-        myOrderItemModelList.add(new MyOrderItemModel(R.mipmap.mobile, 1,"Oppo awf(BLACK)", "Cancelled"));
-        myOrderItemModelList.add(new MyOrderItemModel(R.mipmap.cart_black, 0,"Oppo awf(BLACK)", "Delivered on Mon,15th JAN 2020"));
-
-        MyOrderAdapter myOrderAdapter = new MyOrderAdapter(myOrderItemModelList);
+        MyOrderAdapter myOrderAdapter = new MyOrderAdapter(DBqueries.myOrderItemModelList);
         myOrdersRecyclerView.setAdapter(myOrderAdapter);
-        myOrderAdapter.notifyDataSetChanged();
+
+        if (DBqueries.myOrderItemModelList.size() == 0){
+            DBqueries.loadOrders(getContext(), myOrderAdapter);
+        }
 
         return view;
     }

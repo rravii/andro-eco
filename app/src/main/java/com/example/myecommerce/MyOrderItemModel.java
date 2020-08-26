@@ -26,10 +26,11 @@ public class MyOrderItemModel {
     private String productPrice;
     private Long productQuantity;
     private String userId;
+    private String deliveryPrice;
 
-    private int rating;
+    private int rating = 0;
 
-    public MyOrderItemModel(String productId, String orderStatus, String address, String coupenId, String cuttedPrice, Date orderedDate, Date packedDate, Date shippedDate, Date deliveredDate, Date cancelledDate, String discountedPrice, Long freeCoupens, String fullName, String orderId, String paymentMethod, String pincode, String productPrice, Long productQuantity, String userId, String productImage, String productTitle) {
+    public MyOrderItemModel(String productId, String orderStatus, String address, String coupenId, String cuttedPrice, Date orderedDate, Date packedDate, Date shippedDate, Date deliveredDate, Date cancelledDate, String discountedPrice, Long freeCoupens, String fullName, String orderId, String paymentMethod, String pincode, String productPrice, Long productQuantity, String userId, String productImage, String productTitle, String deliveryPrice) {
         this.productImage = productImage;
         this.productTitle = productTitle;
         this.productId = productId;
@@ -51,6 +52,23 @@ public class MyOrderItemModel {
         this.productPrice = productPrice;
         this.productQuantity = productQuantity;
         this.userId = userId;
+        this.deliveryPrice = deliveryPrice;
+    }
+
+    public String getDeliveryPrice() {
+        return deliveryPrice;
+    }
+
+    public void setDeliveryPrice(String deliveryPrice) {
+        this.deliveryPrice = deliveryPrice;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
     }
 
     public String getProductId() {

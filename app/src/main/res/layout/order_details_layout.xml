@@ -215,7 +215,7 @@
         app:layout_constraintTop_toTopOf="@+id/packed_title" />
 
     <TextView
-        android:id="@+id/pcked_body"
+        android:id="@+id/packed_body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -362,7 +362,7 @@
         android:id="@+id/divider12"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:background="?android:attr/listDivider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

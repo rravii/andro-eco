@@ -454,6 +454,7 @@ public class DeliveryActivity extends AppCompatActivity {
                 orderDetails.put("FullName", fullname.getText());
                 orderDetails.put("Pincode", pincode.getText());
                 orderDetails.put("Free Coupens", cartItemModel.getFreeCoupens());
+                orderDetails.put("Delivery Price", cartItemModel.getDeliveryPrice());
 
                 firebaseFirestore.collection("ORDERS").document(order_id).collection("OrderItems").document(cartItemModel.getProductID())
                         .set(orderDetails).addOnCompleteListener(new OnCompleteListener<Void>() {

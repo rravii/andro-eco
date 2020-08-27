@@ -97,8 +97,9 @@ public class CartAdapter extends RecyclerView.Adapter {
                 boolean qtyError = cartItemModelList.get(position).isQtyError();
                 List<String> qtyIds = cartItemModelList.get(position).getQtyIDs();
                 long stockQty = cartItemModelList.get(position).getStockQuantity();
+                boolean COD = cartItemModelList.get(position).isCOD();
 
-                ((CartItemViewHolder)viewHolder).setItemDetails(productID,resource,title,freeCoupens,productPrice,cuttedPrice,offersApplied,position,inStock,String.valueOf(productQuantity),maxQuantity,qtyError,qtyIds,stockQty);
+                ((CartItemViewHolder)viewHolder).setItemDetails(productID,resource,title,freeCoupens,productPrice,cuttedPrice,offersApplied,position,inStock,String.valueOf(productQuantity),maxQuantity,qtyError,qtyIds,stockQty,COD);
                 break;
             case CartItemModel.TOTAL_AMOUNT:
                 int totalItems = 0;
@@ -180,6 +181,7 @@ public class CartAdapter extends RecyclerView.Adapter {
 
         private LinearLayout deleteBtn;
         private Button redeemBtn;
+        private ImageView codIndicator;
 
         //////coupen Dialog
         private TextView coupenTitle;
@@ -209,12 +211,13 @@ public class CartAdapter extends RecyclerView.Adapter {
             productQuantity = itemView.findViewById(R.id.product_quantity);
             coupenRedemptionLayout = itemView.findViewById(R.id.coupen_redemption_layout);
             coupenRedemptionBody = itemView.findViewById(R.id.tv_coupen_redemption);
+            codIndicator = itemView.findViewById(R.id.cod_indicator);
 
             redeemBtn = itemView.findViewById(R.id.coupen_redemption_btn);
             deleteBtn = itemView.findViewById(R.id.remove_item_btn);
         }
 
-        private void setItemDetails(final String productID, String resource, String title, Long freeCoupensNo, final String productPriceText, String cuttedPriceText, Long offersAppliedNo, final int position, boolean inStock, final String quantity, final Long maxQuantity, boolean qtyError, final List<String> qtyIds, final long stockQty){
+        private void setItemDetails(final String productID, String resource, String title, Long freeCoupensNo, final String productPriceText, String cuttedPriceText, Long offersAppliedNo, final int position, boolean inStock, final String quantity, final Long maxQuantity, boolean qtyError, final List<String> qtyIds, final long stockQty, boolean COD){
 
             Glide.with(itemView.getContext()).load(resource).apply(new RequestOptions().placeholder(R.mipmap.icon_placeholder)).into(productImage);
             productTitle.setText(title);
@@ -223,6 +226,12 @@ public class CartAdapter extends RecyclerView.Adapter {
             checkCoupenPriceDialog.setContentView(R.layout.coupen_redeem_dialog);
             checkCoupenPriceDialog.setCancelable(false);
             checkCoupenPriceDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+
+            if (COD){
+                codIndicator.setVisibility(View.VISIBLE);
+            }else {
+                codIndicator.setVisibility(View.INVISIBLE);
+            }
 
             if (inStock) {
                 if(freeCoupensNo > 0){

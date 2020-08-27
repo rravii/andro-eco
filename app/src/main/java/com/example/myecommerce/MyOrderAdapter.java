@@ -28,6 +28,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Transaction;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -114,7 +115,8 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.ViewHold
             }else{
                 orderIndicator.setImageTintList(ColorStateList.valueOf(itemView.getContext().getResources().getColor(R.color.successBlue)));
             }
-            deliveryStatus.setText(orderStatus + String.valueOf(date));
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, dd MMM YYYY hh:mm aa");
+            deliveryStatus.setText(orderStatus + String.valueOf(simpleDateFormat.format(date)));
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

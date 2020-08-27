@@ -360,7 +360,8 @@ public class ProductDetailsActivity extends AppCompatActivity {
                                                                 if (task.isSuccessful()) {
 
                                                                     if (DBqueries.cartItemModelList.size() != 0) {
-                                                                        DBqueries.cartItemModelList.add(0, new CartItemModel(CartItemModel.CART_ITEM,
+                                                                        DBqueries.cartItemModelList.add(0, new CartItemModel(documentSnapshot.getBoolean("COD"),
+                                                                                CartItemModel.CART_ITEM,
                                                                                 productID,
                                                                                 documentSnapshot.get("product_image_1").toString(),
                                                                                 documentSnapshot.get("product_title").toString(),
@@ -637,7 +638,8 @@ public class ProductDetailsActivity extends AppCompatActivity {
                     loadingDialog.show();
                     productDetailsActivity = ProductDetailsActivity.this;
                     DeliveryActivity.cartItemModelList = new ArrayList<>();
-                    DeliveryActivity.cartItemModelList.add(new CartItemModel(CartItemModel.CART_ITEM,
+                    DeliveryActivity.cartItemModelList.add(new CartItemModel(documentSnapshot.getBoolean("COD"),
+                            CartItemModel.CART_ITEM,
                             productID,
                             documentSnapshot.get("product_image_1").toString(),
                             documentSnapshot.get("product_title").toString(),

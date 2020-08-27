@@ -58,6 +58,8 @@ public class DeliveryActivity extends AppCompatActivity {
     private Button continueProceedBtn;
     public static Dialog loadingDialog;
     private Dialog paymentMethodDialog;
+    private TextView codTitle;
+    private View divider;
     private ImageButton esewa, cod;
     private String paymentMethod = "ESEWA";
     private ConstraintLayout orderConfirmationLayout;
@@ -122,6 +124,8 @@ public class DeliveryActivity extends AppCompatActivity {
         paymentMethodDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
         esewa = paymentMethodDialog.findViewById(R.id.esewa);
         cod = paymentMethodDialog.findViewById(R.id.cod_btn);
+        codTitle = paymentMethodDialog.findViewById(R.id.cod_btn_title);
+        divider = paymentMethodDialog.findViewById(R.id.divider);
         ////// payment dialog
         firebaseFirestore = FirebaseFirestore.getInstance();
         getQtyIDs = true;
@@ -154,6 +158,21 @@ public class DeliveryActivity extends AppCompatActivity {
                 for (CartItemModel cartItemModel : cartItemModelList){
                     if (cartItemModel.isQtyError()){
                         allProductsAvailable = false;
+                        break;
+                    }
+                    if (cartItemModel.getType() == CartItemModel.CART_ITEM) {
+                        if (!cartItemModel.isCOD()) {
+                            cod.setEnabled(false);
+                            cod.setAlpha(0.5f);
+                            codTitle.setAlpha(0.5f);
+                            divider.setVisibility(View.GONE);
+                            break;
+                        } else {
+                            cod.setEnabled(true);
+                            cod.setAlpha(1f);
+                            codTitle.setAlpha(1f);
+                            divider.setVisibility(View.VISIBLE);
+                        }
                     }
                 }
                 if (allProductsAvailable){
@@ -454,7 +473,8 @@ public class DeliveryActivity extends AppCompatActivity {
                 orderDetails.put("FullName", fullname.getText());
                 orderDetails.put("Pincode", pincode.getText());
                 orderDetails.put("Free Coupens", cartItemModel.getFreeCoupens());
-                orderDetails.put("Delivery Price", cartItemModel.getDeliveryPrice());
+                orderDetails.put("Delivery Price", cartItemModelList.get(cartItemModelList.size() - 1).getDeliveryPrice());
+                orderDetails.put("Cancellation requested",false);
 
                 firebaseFirestore.collection("ORDERS").document(order_id).collection("OrderItems").document(cartItemModel.getProductID())
                         .set(orderDetails).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -541,6 +561,7 @@ public class DeliveryActivity extends AppCompatActivity {
                                 if (task.isSuccessful()){
                                     Map<String, Object> userOrder = new HashMap<>();
                                     userOrder.put("order_id", order_id);
+                                    userOrder.put("time",FieldValue.serverTimestamp());
                                     firebaseFirestore.collection("USERS").document(FirebaseAuth.getInstance().getUid()).collection("USER_ORDERS")
                                             .document(order_id).set(userOrder).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override

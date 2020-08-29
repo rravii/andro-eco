@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -39,6 +40,7 @@ public class MyAddressesActivity extends AppCompatActivity {
     private Button deliverHereBtn;
     private static AddressesAdapter addressesAdapter;// here static is used used because we are going to access AddressesAdapter in public static refreshItem
     private Dialog loadingDialog;
+    private int mode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,12 @@ public class MyAddressesActivity extends AppCompatActivity {
         loadingDialog.setCancelable(false);
         loadingDialog.getWindow().setBackgroundDrawable(this.getDrawable(R.drawable.slider_background));
         loadingDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+        loadingDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                addressesSaved.setText(String.valueOf(DBqueries.addressesModelList.size()) + " saved addresses");
+            }
+        });
         ////// loading dialog
 
         previousAddress = DBqueries.selectedAddress;
@@ -69,7 +77,7 @@ public class MyAddressesActivity extends AppCompatActivity {
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         myAddressesRecyclerView.setLayoutManager(layoutManager);
 
-        int mode = getIntent().getIntExtra("MODE", -1);
+        mode = getIntent().getIntExtra("MODE", -1);
         if (mode == SELECT_ADDRESS){
             deliverHereBtn.setVisibility(View.VISIBLE);
         }else {
@@ -111,7 +119,7 @@ public class MyAddressesActivity extends AppCompatActivity {
             }
         });
 
-        addressesAdapter = new AddressesAdapter(DBqueries.addressesModelList, mode);
+        addressesAdapter = new AddressesAdapter(DBqueries.addressesModelList, mode, loadingDialog);
         myAddressesRecyclerView.setAdapter(addressesAdapter);
         ((SimpleItemAnimator)myAddressesRecyclerView.getItemAnimator()).setSupportsChangeAnimations(false);// it disable the fade animation while refreshing the items in the page
         addressesAdapter.notifyDataSetChanged();// it refreshes whole list
@@ -121,7 +129,11 @@ public class MyAddressesActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 Intent addAddressIntent = new Intent(MyAddressesActivity.this, AddAddressActivity.class);
-                addAddressIntent.putExtra("INTENT","null");
+                if (mode != SELECT_ADDRESS){
+                    addAddressIntent.putExtra("INTENT","manage");
+                }else {
+                    addAddressIntent.putExtra("INTENT", "null");
+                }
                 startActivity(addAddressIntent);
 
             }
@@ -142,10 +154,12 @@ public class MyAddressesActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home){
-            if (DBqueries.selectedAddress != previousAddress){
-                DBqueries.addressesModelList.get(DBqueries.selectedAddress).setSelected(false);
-                DBqueries.addressesModelList.get(previousAddress).setSelected(true);
-                DBqueries.selectedAddress = previousAddress;
+            if (mode == SELECT_ADDRESS) {
+                if (DBqueries.selectedAddress != previousAddress) {
+                    DBqueries.addressesModelList.get(DBqueries.selectedAddress).setSelected(false);
+                    DBqueries.addressesModelList.get(previousAddress).setSelected(true);
+                    DBqueries.selectedAddress = previousAddress;
+                }
             }
             finish();
             return true;
@@ -155,10 +169,12 @@ public class MyAddressesActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (DBqueries.selectedAddress != previousAddress){
-            DBqueries.addressesModelList.get(DBqueries.selectedAddress).setSelected(false);
-            DBqueries.addressesModelList.get(previousAddress).setSelected(true);
-            DBqueries.selectedAddress = previousAddress;
+        if (mode == SELECT_ADDRESS) {
+            if (DBqueries.selectedAddress != previousAddress) {
+                DBqueries.addressesModelList.get(DBqueries.selectedAddress).setSelected(false);
+                DBqueries.addressesModelList.get(previousAddress).setSelected(true);
+                DBqueries.selectedAddress = previousAddress;
+            }
         }
         super.onBackPressed();
     }

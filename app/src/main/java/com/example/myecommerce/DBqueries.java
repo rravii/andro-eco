@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -34,6 +35,9 @@ import java.util.Map;
 public class DBqueries {
 
     public static FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+
+    public static String email, fullname, profile;
+
     public static List<CategoryModel> categoryModelList = new ArrayList<>();
 
     public static List<List<HomePageModel>> lists = new ArrayList<>();
@@ -490,7 +494,7 @@ public class DBqueries {
 
     }
 
-    public static void loadAddresses(final Context context, final Dialog loadingDialog){
+    public static void loadAddresses(final Context context, final Dialog loadingDialog, final boolean gotoDeliveryActivity){
 
         addressesModelList.clear();
         firebaseFirestore.collection("USERS").document(FirebaseAuth.getInstance().getUid())
@@ -500,26 +504,36 @@ public class DBqueries {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()){
 
-                    Intent deliveryIntent;
+                    Intent deliveryIntent = null;
 
                     if ((long)task.getResult().get("list_size") == 0){
                         deliveryIntent = new Intent(context,AddAddressActivity.class); // linking the cart proceed button to Address page
                         deliveryIntent.putExtra("INTENT","deliveryIntent");
                     }else {
                         for (long x = 1; x < (long)task.getResult().get("list_size") + 1; x++){
-                            addressesModelList.add(new AddressesModel(task.getResult().get("fullname_" + x).toString(),
-                                    task.getResult().get("address_" + x).toString(),
-                                    task.getResult().get("pincode_" + x).toString(),
-                                    (boolean)task.getResult().get("selected_" + x),
-                                    task.getResult().get("mobile_no_" + x).toString()));
+                            addressesModelList.add(new AddressesModel(task.getResult().getBoolean("selected_" + x),
+                                    task.getResult().getString("city_" + x),
+                                    task.getResult().getString("locality_" + x),
+                                    task.getResult().getString("flat_no_" + x),
+                                    task.getResult().getString("pincode_" + x),
+                                    task.getResult().getString("landmark_" + x),
+                                    task.getResult().getString("name_" + x),
+                                    task.getResult().getString("mobile_no_" + x),
+                                    task.getResult().getString("alternate_mobile_no_" + x),
+                                    task.getResult().getString("state_" + x)
+                                    ));
 
                             if ((boolean)task.getResult().get("selected_" + x)){
                                 selectedAddress = Integer.parseInt(String.valueOf(x - 1));
                             }
                         }
-                        deliveryIntent = new Intent(context,DeliveryActivity.class); // if address present linking the cart proceed button to Delivery page
+                        if (gotoDeliveryActivity) {
+                            deliveryIntent = new Intent(context, DeliveryActivity.class); // if address present linking the cart proceed button to Delivery page
+                        }
                     }
-                    context.startActivity(deliveryIntent);
+                    if (gotoDeliveryActivity) {
+                        context.startActivity(deliveryIntent);
+                    }
 
                 }else {
                     String error = task.getException().getMessage();
@@ -594,7 +608,7 @@ public class DBqueries {
 
     }
 
-    public static void loadOrders(final Context context, final MyOrderAdapter myOrderAdapter, final Dialog loadingDialog){
+    public static void loadOrders(final Context context, @Nullable final MyOrderAdapter myOrderAdapter, final Dialog loadingDialog){
 
         myOrderItemModelList.clear();
         firebaseFirestore.collection("USERS").document(FirebaseAuth.getInstance().getUid()).collection("USER_ORDERS").orderBy("time", Query.Direction.DESCENDING).get()
@@ -640,7 +654,9 @@ public class DBqueries {
                                                 myOrderItemModelList.add(myOrderItemModel);
                                             }
                                             loadRatingList(context);
-                                            myOrderAdapter.notifyDataSetChanged();
+                                            if (myOrderAdapter != null) {
+                                                myOrderAdapter.notifyDataSetChanged();
+                                            }
 
                                         }else {
                                             String error = task.getException().getMessage();

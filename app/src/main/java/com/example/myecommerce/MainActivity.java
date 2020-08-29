@@ -15,7 +15,12 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.navigation.NavigationView;
 
@@ -29,8 +34,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import androidx.appcompat.widget.Toolbar;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.example.myecommerce.RegisterActivity.setSignUpFragment;
 
@@ -60,6 +69,9 @@ public class MainActivity extends AppCompatActivity
     private TextView badgeCount;
     private int scrollFlags;
     private AppBarLayout.LayoutParams params;
+    private CircleImageView profileView;
+    private TextView fullname, email;
+    private ImageView addProfileIcon;
 
     public static DrawerLayout drawer;
 
@@ -86,6 +98,11 @@ public class MainActivity extends AppCompatActivity
 
         frameLayout = findViewById(R.id.main_framelayout);
 
+        profileView = navigationView.getHeaderView(0).findViewById(R.id.main_profile_image);
+        fullname = navigationView.getHeaderView(0).findViewById(R.id.main_fullname);
+        email = navigationView.getHeaderView(0).findViewById(R.id.main_email);
+        addProfileIcon = navigationView.getHeaderView(0).findViewById(R.id.add_profile_icon);
+
         if (showCart) {
             mainActivity = this;
             drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);// here 1 means drawer is locked
@@ -110,7 +127,7 @@ public class MainActivity extends AppCompatActivity
 
         Button dialogSignInBtn = signInDialog.findViewById(R.id.sign_in_btn);
         Button dialogSignUpBtn = signInDialog.findViewById(R.id.sign_up_btn);
-        final Intent registerIntent = new Intent(MainActivity.this,RegisterActivity.class);
+        final Intent registerIntent = new Intent(MainActivity.this, RegisterActivity.class);
 
         dialogSignInBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,6 +159,30 @@ public class MainActivity extends AppCompatActivity
         if (currentUser == null){
             navigationView.getMenu().getItem(navigationView.getMenu().size() - 1).setEnabled(false);// sign out button disable
         }else {
+            FirebaseFirestore.getInstance().collection("USERS").document(currentUser.getUid())
+                    .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()){
+                        DBqueries.fullname = task.getResult().getString("fullname");
+                        DBqueries.email = task.getResult().getString("email");
+                        DBqueries.profile = task.getResult().getString("profile");
+
+                        fullname.setText(DBqueries.fullname);
+                        email.setText(DBqueries.email);
+                        if (DBqueries.profile.equals("")){
+                            addProfileIcon.setVisibility(View.VISIBLE);
+                        }else {
+                            addProfileIcon.setVisibility(View.INVISIBLE);
+                            Glide.with(MainActivity.this).load(DBqueries.profile).apply(new RequestOptions().placeholder(R.mipmap.profile_placeholder)).into(profileView);
+                        }
+
+                    }else {
+                        String error = task.getException().getMessage();
+                        Toast.makeText(MainActivity.this, error, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
             navigationView.getMenu().getItem(navigationView.getMenu().size() - 1).setEnabled(true);// sign out button enable
         }
         if (resetMainActivity){

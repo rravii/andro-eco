@@ -207,6 +207,27 @@ public class OrderDetailsActivity extends AppCompatActivity {
                 deliveredIndicator.setVisibility(View.GONE);
                 break;
 
+            case "Out for Delivery":
+                orderedIndicator.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.successBlue)));
+                orderedDate.setText(String.valueOf(simpleDateFormat.format(model.getOrderedDate())));
+
+                packedIndicator.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.successBlue)));
+                packedDate.setText(String.valueOf(simpleDateFormat.format(model.getPackedDate())));
+
+                shippedIndicator.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.successBlue)));
+                shippedDate.setText(String.valueOf(simpleDateFormat.format(model.getShippedDate())));
+
+                deliveredIndicator.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.successBlue)));
+                deliveredDate.setText(String.valueOf(simpleDateFormat.format(model.getDeliveredDate())));
+
+                O_P_progress.setProgress(100);
+                P_S_progress.setProgress(100);
+                S_D_progress.setProgress(100);
+
+                deliveredTitle.setText("Out for Delivery");
+                deliveredBody.setText("Your order is out for delivery.");
+                break;
+
             case "Delivered":
                 orderedIndicator.setImageTintList(ColorStateList.valueOf(getResources().getColor(R.color.successBlue)));
                 orderedDate.setText(String.valueOf(simpleDateFormat.format(model.getOrderedDate())));

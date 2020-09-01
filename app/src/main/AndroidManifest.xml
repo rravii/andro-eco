@@ -15,7 +15,8 @@
         android:roundIcon="@mipmap/app_round_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".OTPverificationActivity"></activity>
+        <activity android:name=".UpdateUserInfoActivity"></activity>
+        <activity android:name=".OTPverificationActivity" />
         <activity android:name=".ViewAllActivity" />
         <activity android:name=".MyAddressesActivity" />
         <activity

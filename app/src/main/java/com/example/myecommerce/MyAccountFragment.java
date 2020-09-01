@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -70,6 +71,7 @@ public class MyAccountFragment extends Fragment {
         }
     }
 
+    private FloatingActionButton settingsBtn;
     private Button viewAllAddressBtn, signoutBtn;
     public static final int MANAGE_ADDRESS = 1;
     private CircleImageView profileView, currentOrderImage;
@@ -115,12 +117,7 @@ public class MyAccountFragment extends Fragment {
         address = view.findViewById(R.id.address);
         pincode = view.findViewById(R.id.address_pincode);
         signoutBtn = view.findViewById(R.id.sign_out_btn);
-
-        name.setText(DBqueries.fullname);
-        email.setText(DBqueries.email);
-        if (!DBqueries.profile.equals("")){
-            Glide.with(getContext()).load(DBqueries.profile).apply(new RequestOptions().placeholder(R.mipmap.profile_placeholder)).into(profileView);
-        }
+        settingsBtn = view.findViewById(R.id.settings_btn);
 
         layoutContainer.getChildAt(1).setVisibility(View.GONE);// here layoutContainer ko index 1 i.e order_status_layout will hide
         loadingDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -231,12 +228,32 @@ public class MyAccountFragment extends Fragment {
             }
         });
 
+        settingsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent updateUserInfo = new Intent(getContext(), UpdateUserInfoActivity.class);
+                updateUserInfo.putExtra("Name", name.getText());
+                updateUserInfo.putExtra("Email", email.getText());
+                updateUserInfo.putExtra("Photo", DBqueries.profile);
+                startActivity(updateUserInfo);
+            }
+        });
+
         return view;
     }
 
     @Override
     public void onStart() {
         super.onStart();
+
+        name.setText(DBqueries.fullname);
+        email.setText(DBqueries.email);
+        if (!DBqueries.profile.equals("")){
+            Glide.with(getContext()).load(DBqueries.profile).apply(new RequestOptions().placeholder(R.mipmap.profile_placeholder)).into(profileView);
+        }else {
+            profileView.setImageResource(R.mipmap.profile_placeholder);
+        }
+
         if (!loadingDialog.isShowing()){
             if (DBqueries.addressesModelList.size() == 0){
                 addressname.setText("No Address");

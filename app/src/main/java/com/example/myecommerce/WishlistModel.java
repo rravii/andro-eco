@@ -1,5 +1,7 @@
 package com.example.myecommerce;
 
+import java.util.ArrayList;
+
 public class WishlistModel {
 
     private String productId;
@@ -12,6 +14,7 @@ public class WishlistModel {
     private String cuttedPrice;
     private boolean COD;
     private boolean inStock;
+    private ArrayList<String> tags;
 
     public WishlistModel(String productId, String productImage, String productTitle, long freeCoupens, String rating, long totalRatings, String productPrice, String cuttedPrice, boolean COD, boolean inStock) {
         this.productId = productId;
@@ -24,6 +27,14 @@ public class WishlistModel {
         this.cuttedPrice = cuttedPrice;
         this.inStock = inStock;
         this.COD = COD;
+    }
+
+    public ArrayList<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(ArrayList<String> tags) {
+        this.tags = tags;
     }
 
     public boolean isInStock() {

@@ -396,9 +396,8 @@ public class UpdateInfoFragment extends Fragment {
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()){
                     if (updateData.size() > 1){
-                        DBqueries.email = nameField.getText().toString().trim();
+                        DBqueries.email = emailField.getText().toString().trim();
                         DBqueries.fullname = nameField.getText().toString().trim();
-
                     }else {
                         DBqueries.fullname = nameField.getText().toString().trim();
                     }

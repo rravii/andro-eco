@@ -21,7 +21,10 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -58,6 +61,9 @@ public class DBqueries {
     public static List<RewardModel> rewardModelList = new ArrayList<>();
 
     public static List<MyOrderItemModel> myOrderItemModelList = new ArrayList<>();
+
+    public static List<NotificationModel> notificationModelList = new ArrayList<>();
+    private static ListenerRegistration registration;
 
     public static void loadCategories(final RecyclerView categoryRecyclerView, final Context context){
         categoryModelList.clear();
@@ -675,6 +681,48 @@ public class DBqueries {
                         }
                     }
                 });
+
+    }
+
+    public static void checkNotifications(boolean remove, @Nullable final TextView notifyCount){
+
+        if (remove){
+            registration.remove();
+        }else {
+            registration = firebaseFirestore.collection("USERS").document(FirebaseAuth.getInstance().getUid())
+                    .collection("USER_DATA").document("MY_NOTIFICATIONS").addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+
+                            if (documentSnapshot != null && documentSnapshot.exists()){
+                                notificationModelList.clear();
+                                int unread = 0;
+                                for (long x = 0; x < (long)documentSnapshot.get("list_size"); x++){
+                                    notificationModelList.add(0, new NotificationModel(documentSnapshot.get("Image_" + x).toString(), documentSnapshot.get("Body_"+ x).toString(), documentSnapshot.getBoolean("Readed_" + x)));
+
+                                    if (!documentSnapshot.getBoolean("Readed_" + x)){
+                                        unread++;
+                                        if (notifyCount != null){
+                                            if (unread > 0) {
+                                                notifyCount.setVisibility(View.VISIBLE);
+                                                if (unread < 99) {
+                                                    notifyCount.setText(String.valueOf(unread));
+                                                } else {
+                                                    notifyCount.setText("99");
+                                                }
+                                            }else {
+                                                notifyCount.setVisibility(View.INVISIBLE);
+                                            }
+                                        }
+                                    }
+                                }
+                                if (NotificationActivity.adapter != null){
+                                    NotificationActivity.adapter.notifyDataSetChanged();
+                                }
+                            }
+                        }
+                    });
+        }
 
     }
 

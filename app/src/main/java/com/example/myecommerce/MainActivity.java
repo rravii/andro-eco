@@ -207,6 +207,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+
+        DBqueries.checkNotifications(true,null);
+
+    }
+
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if(drawer.isDrawerOpen(GravityCompat.START)){
@@ -268,6 +276,25 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
             });
+
+            MenuItem notifyItem = menu.findItem(R.id.main_notification_icon);
+            notifyItem.setActionView(R.layout.badge_layout);
+            ImageView notifyIcon = notifyItem.getActionView().findViewById(R.id.badge_icon);
+            notifyIcon.setImageResource(R.mipmap.bell);
+            TextView notifyCount = notifyItem.getActionView().findViewById(R.id.badge_count);
+
+            if (currentUser != null){
+                DBqueries.checkNotifications(false,notifyCount);
+            }
+
+            notifyItem.getActionView().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent notificationIntent = new Intent(MainActivity.this, NotificationActivity.class);
+                    startActivity(notificationIntent);
+                }
+            });
+
         }
         return true;
     }
@@ -285,7 +312,8 @@ public class MainActivity extends AppCompatActivity
             startActivity(searchIntent);
             return true;
         }else if(id == R.id.main_notification_icon){
-            ///todo: notification
+            Intent notificationIntent = new Intent(this, NotificationActivity.class);
+            startActivity(notificationIntent);
             return true;
         }else if (id == R.id.main_cart_icon){
             if (currentUser == null) {

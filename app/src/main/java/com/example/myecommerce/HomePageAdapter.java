@@ -24,6 +24,10 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +38,7 @@ public class HomePageAdapter extends RecyclerView.Adapter {
 
     private List<HomePageModel> homePageModelList;
     private RecyclerView.RecycledViewPool recycledViewPool;
+    private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     private int lastPosition = -1;
 
     public HomePageAdapter(List<HomePageModel> homePageModelList) {
@@ -259,10 +264,56 @@ public class HomePageAdapter extends RecyclerView.Adapter {
             horizontalRecyclerView.setRecycledViewPool(recycledViewPool);
         }
 
-        private void setHorizontalProductLayout(List<HorizontalProductScrollModel> horizontalProductScrollModelList, final String title, String color, final List<WishlistModel> viewAllProductList){
+        private void setHorizontalProductLayout(final List<HorizontalProductScrollModel> horizontalProductScrollModelList, final String title, String color, final List<WishlistModel> viewAllProductList){
 
             container.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(color)));
             horizontalLayoutTitle.setText(title);
+
+            for (final HorizontalProductScrollModel model: horizontalProductScrollModelList){
+
+                if (!model.getProductID().isEmpty() && model.getProductTitle().isEmpty()){
+
+                    firebaseFirestore.collection("PRODUCTS").document(model.getProductID())
+                            .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                            if (task.isSuccessful()){
+
+                                model.setProductTitle(task.getResult().getString("product_title"));
+                                model.setProductImage(task.getResult().getString("product_image_1"));
+                                model.setProductPrice(task.getResult().getString("product_price"));
+
+                                WishlistModel wishlistModel = viewAllProductList.get(horizontalProductScrollModelList.indexOf(model));
+
+                                wishlistModel.setTotalRatings(task.getResult().getLong("total_ratings"));
+                                wishlistModel.setRating(task.getResult().getString("average_rating"));
+                                wishlistModel.setProductTitle(task.getResult().getString("product_title"));
+                                wishlistModel.setProductPrice(task.getResult().getString("product_price"));
+                                wishlistModel.setProductImage(task.getResult().getString("product_image_1"));
+                                wishlistModel.setFreeCoupens(task.getResult().getLong("free_coupens"));
+                                wishlistModel.setCuttedPrice(task.getResult().getString("cutted_price"));
+                                wishlistModel.setCOD(task.getResult().getBoolean("COD"));
+                                wishlistModel.setInStock(task.getResult().getLong("stock_quantity") > 0);
+
+                                if (horizontalProductScrollModelList.indexOf(model) == horizontalProductScrollModelList.size()-1){
+
+                                    if (horizontalRecyclerView.getAdapter() != null){
+                                        horizontalRecyclerView.getAdapter().notifyDataSetChanged();
+                                    }
+
+                                }
+
+                            }else {
+                                // do nothing
+                            }
+
+                        }
+                    });
+
+                }
+
+            }
 
             if(horizontalProductScrollModelList.size() > 8){
                 horizontalLayoutViewAllBtn.setVisibility(View.VISIBLE);
@@ -310,6 +361,57 @@ public class HomePageAdapter extends RecyclerView.Adapter {
             container.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(color)));
             gridLayoutTitle.setText(title);
 
+            for (final HorizontalProductScrollModel model: horizontalProductScrollModelList){
+
+                if (!model.getProductID().isEmpty() && model.getProductTitle().isEmpty()){
+
+                    firebaseFirestore.collection("PRODUCTS").document(model.getProductID())
+                            .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                            if (task.isSuccessful()){
+
+                                model.setProductTitle(task.getResult().getString("product_title"));
+                                model.setProductImage(task.getResult().getString("product_image_1"));
+                                model.setProductPrice(task.getResult().getString("product_price"));
+
+                                if (horizontalProductScrollModelList.indexOf(model) == horizontalProductScrollModelList.size()-1){
+
+                                    setGridData(title, horizontalProductScrollModelList);
+
+                                    if (!title.equals("")) {
+                                        gridLayoutViewAllBtn.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                ViewAllActivity.horizontalProductScrollModelList = horizontalProductScrollModelList;
+                                                Intent viewAllIntent = new Intent(itemView.getContext(), ViewAllActivity.class);
+                                                viewAllIntent.putExtra("layout_code", 1);
+                                                viewAllIntent.putExtra("title", title);
+                                                itemView.getContext().startActivity(viewAllIntent);
+                                            }
+                                        });
+                                    }
+
+                                }
+
+                            }else {
+                                // do nothing
+                            }
+
+                        }
+                    });
+
+                }
+
+            }
+
+            setGridData(title, horizontalProductScrollModelList);
+
+        }
+
+        private void setGridData(String title, final List<HorizontalProductScrollModel> horizontalProductScrollModelList){
+
             for(int x = 0; x < 4; x++){
                 ImageView productImage = gridProductLayout.getChildAt(x).findViewById(R.id.h_s_product_image);
                 TextView productTitle = gridProductLayout.getChildAt(x).findViewById(R.id.h_s_product_title);
@@ -334,20 +436,6 @@ public class HomePageAdapter extends RecyclerView.Adapter {
                         }
                     });
                 }
-            }
-
-
-            if (!title.equals("")) {
-                gridLayoutViewAllBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        ViewAllActivity.horizontalProductScrollModelList = horizontalProductScrollModelList;
-                        Intent viewAllIntent = new Intent(itemView.getContext(), ViewAllActivity.class);
-                        viewAllIntent.putExtra("layout_code", 1);
-                        viewAllIntent.putExtra("title", title);
-                        itemView.getContext().startActivity(viewAllIntent);
-                    }
-                });
             }
         }
     }

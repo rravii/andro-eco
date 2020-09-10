@@ -46,33 +46,24 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.airbnb.lottie.LottieAnimationView
-            android:layout_width="280dp"
-            android:layout_height="280dp"
+            android:layout_width="wrap_content"
+            android:layout_height="300dp"
             app:lottie_autoPlay="true"
             app:lottie_loop="true"
-            app:lottie_rawRes="@raw/no_internet_connection"
-            app:lottie_speed="0.8" />
+            app:lottie_rawRes="@raw/no_internet_connection" />
 
-        <com.airbnb.lottie.LottieAnimationView
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            app:lottie_autoPlay="true"
-            app:lottie_loop="true"
-            app:lottie_rawRes="@raw/connecting"
-            app:lottie_speed="0.7" />
+        <!--        <TextView-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginStart="40dp"-->
+        <!--            android:layout_marginTop="8dp"-->
+        <!--            android:layout_marginEnd="40dp"-->
+        <!--            android:gravity="center"-->
+        <!--            android:text="Please check your internet connection if it takes longer to connect."-->
+        <!--            android:textColor="#757575"-->
+        <!--            android:textSize="14sp"-->
+        <!--            android:textStyle="italic" />-->
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="40dp"
-            android:gravity="center"
-            android:text="Please check your internet connection if it takes longer to connect."
-            android:textColor="#757575"
-            android:textSize="14sp"
-            android:textStyle="italic" />
-        
         <Button
             android:id="@+id/retry_btn"
             android:layout_width="wrap_content"
@@ -81,12 +72,12 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:stateListAnimator="@null"
             android:text="Retry"
             android:textAllCaps="false"
-            android:backgroundTint="@color/colorPrimaryDark"
             android:textColor="@color/colorAccent"
-            android:translationZ="8dp"
-            android:stateListAnimator="@null" />
+            android:translationZ="8dp" />
     </LinearLayout>
 
 

@@ -136,7 +136,7 @@ public class OrderDetailsActivity extends AppCompatActivity {
         quantity.setText("Qty: " + String.valueOf(model.getProductQuantity()));
         Glide.with(this).load(model.getProductImage()).into(productImage);
 
-        simpleDateFormat = new SimpleDateFormat("EEE, dd MMM YYYY hh:mm aa");
+        simpleDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm aa");
         switch (model.getOrderStatus()){
 
             case "Ordered":

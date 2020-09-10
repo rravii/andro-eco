@@ -65,6 +65,8 @@ public class DeliveryActivity extends AppCompatActivity {
     private ConstraintLayout orderConfirmationLayout;
     private ImageButton continueShoppingBtn;
     private TextView orderId;
+    private TextView phoneNo;
+    private String userNo;
     private boolean successResponse = false;
     public static boolean fromCart;
     public static boolean codOrderConfirmed = false;
@@ -80,7 +82,7 @@ public class DeliveryActivity extends AppCompatActivity {
     private static final String M_id = "JB0BBQ4aD0UqIThFJwAKBgAXEUkEGQUBBAwdOgABHD4DChwUAB0R";
     private static final String M_secret_key = "BhwIWQQADhIYSxILExMcAgFXFhcOBwAKBgAXEQ==";
     private static final String customer_id = FirebaseAuth.getInstance().getUid();
-    private static final String order_id = UUID.randomUUID().toString().substring(0,28);
+    private static String order_id;
 
     /////payment
 
@@ -107,6 +109,7 @@ public class DeliveryActivity extends AppCompatActivity {
         orderConfirmationLayout = findViewById(R.id.order_confirmation_layout);
         continueShoppingBtn = findViewById(R.id.continue_shopping_btn);
         orderId = findViewById(R.id.order_id);
+        phoneNo = findViewById(R.id.phone_no);
 
         ////// loading dialog
         loadingDialog = new Dialog(DeliveryActivity.this);
@@ -130,7 +133,8 @@ public class DeliveryActivity extends AppCompatActivity {
         firebaseFirestore = FirebaseFirestore.getInstance();
         getQtyIDs = true;
 
-        //// todo: order_id = .........
+        order_id = UUID.randomUUID().toString().substring(0,28);
+        phoneNo.setText("You will shortly receive a phone call on +977" + DBqueries.addressesModelList.get(DBqueries.selectedAddress).getMobileNo() + " from My Ecommerce.");
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -376,6 +380,7 @@ public class DeliveryActivity extends AppCompatActivity {
     private void showConfirmationLayout(){
         successResponse = true;
         codOrderConfirmed = false;
+
         getQtyIDs = false;
         for (int x = 0; x < cartItemModelList.size() - 1; x++){
 
@@ -598,7 +603,7 @@ public class DeliveryActivity extends AppCompatActivity {
                                         }
                                     });
                                 }else {
-                                    Toast.makeText(DeliveryActivity.this, "Order CANCELLED", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(DeliveryActivity.this, "Order CANCELLED", Toast.LENGTH_LONG).show();
                                 }
                             }
                         });
